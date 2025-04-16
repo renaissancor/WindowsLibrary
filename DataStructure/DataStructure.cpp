@@ -1,10 +1,36 @@
-﻿// DataStructure.cpp : 이 파일에는 'main' 함수가 포함됩니다. 거기서 프로그램 실행이 시작되고 종료됩니다.
-//
+﻿#include <iostream>
+#include "CHeap.h" // Replace this with the actual name of your header if separated
 
-#include <iostream>
+int main() {
+    MaxHeap<int> maxHeap;
+    MinHeap<int> minHeap;
 
-int main()
-{
-    std::cout << "Hello World!\n";
+    // Test values
+    int values[] = { 5, 3, 10, 1, 7 };
+
+    std::cout << "Pushing into MaxHeap:\n";
+    for (int val : values) {
+        std::cout << "Push: " << val << "\n";
+        maxHeap.push(val);
+    }
+
+    std::cout << "\nMaxHeap Pop Sequence:\n";
+    while (!maxHeap.empty()) {
+        std::cout << maxHeap.pop() << " ";
+    }
+    std::cout << "\n";
+
+    std::cout << "\nPushing into MinHeap:\n";
+    for (int val : values) {
+        std::cout << "Push: " << val << "\n";
+        minHeap.push(val);
+    }
+
+    std::cout << "\nMinHeap Pop Sequence:\n";
+    while (!minHeap.empty()) {
+        std::cout << minHeap.pop() << " ";
+    }
+    std::cout << "\n";
+
+    return 0;
 }
-

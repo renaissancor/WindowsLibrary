@@ -18,17 +18,17 @@ protected:
 
 	virtual bool compare(const T& a, const T& b) const = 0; 
 
-	int parentIdx(int i)
+	int getParent(int i)
 	{
 		return (i - 1) / 2; 
 	}
 
-	int leftChildIdx(int i)
+	int getLeftChild(int i)
 	{
 		return 2 * i + 1; 
 	}
 
-	int rightChildIdx(int i)
+	int getRightChild(int i)
 	{
 		return 2 * i + 2; 
 	}
@@ -38,12 +38,13 @@ public:
 
 	const T& top() const
 	{
+		assert(m_Size > 0);
 		return *m_Data; 
 	}
 
 	bool empty() const
 	{
-		return !(m_Size); 
+		return m_Size == 0;
 	}
 
 	int size() const
@@ -53,14 +54,15 @@ public:
 
 
 public: // function declaration 
-	Heap(){}
-	~Heap(){}
+	Heap(); 
+	~Heap();
+
 	void reserve(int _Capacity); 
 	void resize(int _Size); 
 
+	void swap(int i, int j);
 	void heapifyUp(int index);
 	void heapifyDown(int index);
-	void swap(int i, int j);
 
 	void push(const T& _Data);
 	T pop();
@@ -122,13 +124,79 @@ void Heap<T>::resize(int _Size)
 }
 
 template<typename T>
+void Heap<T>::swap(int i, int j)
+{
+	T temp = *(m_Data + i); 
+	*(m_Data + i) = *(m_Data + j); 
+	*(m_Data + j) = temp; 
+}
+
+template<typename T>
+void Heap<T>::heapifyUp(int index)
+{
+	// Used for push()
+	// when new element is added to the end of the dynamic array 
+	// Swap it until it reaches to the root 
+
+	while (index > 0)
+	{
+		int parent = getParent(index); 
+		if (compare(m_Data[index], m_Data[parent]))
+		{
+			swap(index, parent);
+			index = parent; 
+		}
+		else {
+			break; 
+		}
+	}
+
+	// After push, from end to root maximum O(log N) comparison happens 
+	// Result will make sure every parents have priority than children 	
+}
+
+template<typename T>
+void Heap<T>::heapifyDown(int index)
+{
+	// Used for pop
+	// Find the minimum by searching all child nodes 
+
+	while (true)
+	{
+		int left = getLeftChild(index); 
+		int right = getRightChild(index); 
+		int selected = index; 
+
+		if (left < m_Size && compare(m_Data[left], m_Data[selected]))
+			selected = left;
+		if (right < m_Size && compare(m_Data[right], m_Data[selected]))
+			selected = right;
+
+		if (selected == index)
+		{
+			break; 
+		}
+		else
+		{
+			swap(index, selected); 
+			index = selected; 
+		}
+
+	}
+
+	// After pop, the root value should be empty. 
+}
+
+template<typename T>
 void Heap<T>::push(const T& _Data)
 {
 	if (m_Size == m_Capacity) {
 		reserve(m_Capacity == 0 ? 1 : m_Capacity * 2);
 	}
 
-	m_Data[m_Size++] = _Data; 
+	m_Data[m_Size] = _Data; 
+	heapifyUp(m_Size); 
+	++m_Size; 
 }
 
 
@@ -140,11 +208,15 @@ T Heap<T>::pop()
 	T root = m_Data[0]; 
 	m_Data[0] = m_Data[--m_Size]; 
 
-	return m_Data[0]; 
+	if (!this->empty()) {
+		heapifyDown(0);
+	}
+
+	return root; 
 }
 
 template<typename T>
-class MaxHeap : public Heap {
+class MaxHeap : public Heap<T> {
 	bool compare(const T& a, const T& b) const override
 	{
 		return a > b; 
@@ -152,7 +224,7 @@ class MaxHeap : public Heap {
 };
 
 template<typename T>
-class MinHeap : public Heap {
+class MinHeap : public Heap<T> {
 	bool compare(const T& a, const T& b) const override
 	{
 		return a < b;
