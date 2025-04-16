@@ -1,0 +1,12 @@
+# ninja log v6
+10	277	7665486041531033	CMakeFiles/DataStructure.dir/src/check.cpp.obj	ede07590c0278e38
+4	267	7665486532883755	CMakeFiles/DataStructure.dir/src/main.cpp.obj	da28756ca65572fe
+11	272	7665486532953769	CMakeFiles/DataStructure.dir/src/check.cpp.obj	ede07590c0278e38
+272	594	7665486535557583	DataStructure.exe	294fa3e08dab3a3d
+3	710	7665501535606329	CMakeFiles/DataStructure.dir/src/main.cpp.obj	da28756ca65572fe
+10	713	7665501535676335	CMakeFiles/DataStructure.dir/src/check.cpp.obj	ede07590c0278e38
+713	867	7665501542714705	DataStructure.exe	294fa3e08dab3a3d
+3	265	7665502052392865	CMakeFiles/DataStructure.dir/src/check.cpp.obj	ede07590c0278e38
+275	408	7665502055114312	DataStructure.exe	294fa3e08dab3a3d
+2	265	7665502402551870	CMakeFiles/DataStructure.dir/src/check.cpp.obj	ede07590c0278e38
+265	414	7665502405179171	DataStructure.exe	294fa3e08dab3a3d
