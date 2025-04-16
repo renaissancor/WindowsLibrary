@@ -227,6 +227,19 @@ void Heap<T>::heapifyUp(int index)
 	// Result will make sure every parents have priority than children 	
 }
 
+
+template<typename T>
+void Heap<T>::push(const T& _Data)
+{
+	if (m_Size == m_Capacity) {
+		reserve(m_Capacity == 0 ? 1 : m_Capacity * 2);
+	}
+
+	m_Data[m_Size] = _Data;
+	heapifyUp(m_Size);
+	++m_Size;
+}
+
 template<typename T>
 void Heap<T>::heapifyDown(int idx)
 {
@@ -257,17 +270,6 @@ void Heap<T>::heapifyDown(int idx)
 	// After pop, the root value should be empty. 
 }
 
-template<typename T>
-void Heap<T>::push(const T& _Data)
-{
-	if (m_Size == m_Capacity) {
-		reserve(m_Capacity == 0 ? 1 : m_Capacity * 2);
-	}
-
-	m_Data[m_Size] = _Data; 
-	heapifyUp(m_Size); 
-	++m_Size; 
-}
 
 
 template<typename T>
