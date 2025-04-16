@@ -1,7 +1,8 @@
-﻿#include <iostream>
+#include <iostream>
 #include "CHeap.h" // Replace this with the actual name of your header if separated
 
-int main() {
+void CHeapTest()
+{
     MaxHeap<int> maxHeap;
     MinHeap<int> minHeap;
 
@@ -31,6 +32,4 @@ int main() {
         std::cout << minHeap.pop() << " ";
     }
     std::cout << "\n";
-
-    return 0;
 }

@@ -230,3 +230,5 @@ class MinHeap : public Heap<T> {
 		return a < b;
 	}
 };
+
+void CHeapTest();
