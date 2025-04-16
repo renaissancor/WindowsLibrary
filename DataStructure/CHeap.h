@@ -34,8 +34,6 @@ protected:
 	}
 
 public:
-
-
 	const T& top() const
 	{
 		assert(m_Size > 0);
@@ -52,20 +50,94 @@ public:
 		return m_Size; 
 	}
 
+	class iterator; // Forward declaration 
+	
+	iterator begin()
+	{
+		if (m_Size == 0)
+			return iterator(this, -1);
+		else
+			return iterator(this, 0);
+	}
+
+	iterator end()
+	{
+		return iterator(this, -1);
+	}
 
 public: // function declaration 
 	Heap(); 
 	~Heap();
 
+	class iterator
+	{
+	private:
+		Heap<T>* m_Owner;
+		int		 m_Idx;
+
+	public: 
+		T& operator*()
+		{
+			return m_Owner->m_Data[m_Idx];
+		}
+
+		iterator& operator ++()
+		{
+			assert(m_Idx != -1);
+			++m_Idx;
+			if (m_Owner->m_Size <= m_Idx)
+			{
+				m_Idx = -1;
+			}
+			return *this;
+		}
+		
+		iterator operator ++(int _Data)
+		{
+			iterator copyiter(*this);
+			++(*this);
+			return copyiter;
+		}
+
+		bool operator == (const iterator& _Other)
+		{
+			return (m_Owner == _Other.m_Owner && m_Idx == _Other.m_Idx);
+		}
+
+		bool operator !=(const iterator& _Other)
+		{
+			return !((*this) == _Other);
+		}
+	
+		iterator()
+			: m_Owner(nullptr)
+			, m_Idx(-1) {
+		}
+
+		iterator(Heap<T>* owner, int idx)
+			: m_Owner(owner), m_Idx(idx) {
+		}
+
+		~iterator() {
+		}
+
+		friend class Heap; 
+	};
+
+
+public: 
 	void reserve(int _Capacity); 
 	void resize(int _Size); 
 
 	void swap(int i, int j);
 	void heapifyUp(int index);
-	void heapifyDown(int index);
+	void heapifyDown(int idx); 
 
 	void push(const T& _Data);
 	T pop();
+
+	void sortHelper(int idx, int heapSize); // Helper function for sort()
+	void sort(); // Heap Sort of Dynamic Array 
 };
 
 
@@ -156,34 +228,32 @@ void Heap<T>::heapifyUp(int index)
 }
 
 template<typename T>
-void Heap<T>::heapifyDown(int index)
+void Heap<T>::heapifyDown(int idx)
 {
 	// Used for pop
-	// Find the minimum by searching all child nodes 
-
+	// Find the min or max by searching all child nodes 
+	// Pivot is considered as the root node of the heapify down, ignoring formal array index 
 	while (true)
 	{
-		int left = getLeftChild(index); 
-		int right = getRightChild(index); 
-		int selected = index; 
+		int left = getLeftChild(idx); 
+		int right = getRightChild(idx); 
+		int selected = idx; 
 
 		if (left < m_Size && compare(m_Data[left], m_Data[selected]))
 			selected = left;
 		if (right < m_Size && compare(m_Data[right], m_Data[selected]))
 			selected = right;
 
-		if (selected == index)
+		if (selected == idx)
 		{
 			break; 
 		}
 		else
 		{
-			swap(index, selected); 
-			index = selected; 
+			swap(idx, selected); 
+			idx = selected; 
 		}
-
 	}
-
 	// After pop, the root value should be empty. 
 }
 
@@ -215,6 +285,54 @@ T Heap<T>::pop()
 	return root; 
 }
 
+
+
+template<typename T>
+void Heap<T>::sortHelper(int idx, int heapSize)
+{
+	// Helper function for sort()
+	// This function is used to build the heap structure 
+	// by calling heapifyDown on each non-leaf node in reverse order.
+	while (true)
+	{
+		int left = getLeftChild(idx);
+		int right = getRightChild(idx);
+		int selected = idx;
+
+		// Only consider elements within the current heap size
+		if (left < heapSize && compare(m_Data[selected], m_Data[left]))
+			selected = left;
+
+		if (right < heapSize && compare(m_Data[selected], m_Data[right]))
+			selected = right;
+
+		if (selected == idx)
+			break;
+
+		swap(idx, selected);
+		idx = selected;
+	}
+}
+
+template<typename T>
+void Heap<T>::sort()
+{
+	// Build heap (heapify all non-leaf nodes)
+	for (int i = m_Size / 2 - 1; i >= 0; i--)
+		sortHelper(i, m_Size);
+
+	// Extract elements one by one
+	for (int i = m_Size - 1; i > 0; i--)
+	{
+		// Move current root to end
+		swap(0, i);
+
+		// Call heapify on the reduced heap
+		sortHelper(0, i);
+	}
+
+}
+
 template<typename T>
 class MaxHeap : public Heap<T> {
 	bool compare(const T& a, const T& b) const override
@@ -231,4 +349,7 @@ class MinHeap : public Heap<T> {
 	}
 };
 
+// Class support by min max 
+
 void CHeapTest();
+// Test function to demonstrate the usage of the heap classes 
