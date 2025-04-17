@@ -73,7 +73,7 @@ public: // function declaration
 	{
 	private:
 		PQHeap<T>* m_Owner;
-		int		 m_Idx;
+		int		   m_Idx;
 
 	public: 
 		T& operator*()

@@ -9,6 +9,6 @@ include_directories(include)
 # Add your source files
 add_executable(DataStructure
     src/main.cpp
-    src/check.cpp
+    src/BSTree.cpp
     # add more cpp files here if needed
 )
