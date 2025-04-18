@@ -19,7 +19,6 @@ struct Pair
 	T2 val;
 };
 
-
 template<typename T1, typename T2>
 struct Node
 {
@@ -66,11 +65,11 @@ public:
 
 	class iterator; 
 	
-	iterator end() { return iterator(this, nullptr); }
 	iterator begin() { 
-		if (m_Root = nullptr) return iterator(this, nullptr);
 
 		Node<T1, T2>* itrNode = m_Root; 
+		if (m_Root == nullptr) return iterator(this, nullptr);
+
 		while (itrNode->ptr[LCHILD] != nullptr)
 		{
 			itrNode = itrNode->ptr[LCHILD];
@@ -78,6 +77,8 @@ public:
 
 		return iterator(this, itrNode); 
 	}
+
+	iterator end() { return iterator(this, nullptr); }
 
 	iterator find(const T1& _key); 
 
@@ -117,12 +118,104 @@ public:
 
 		iterator& operator ++()
 		{
-			return *this;
+			Node<T1, T2>* itr_node = m_TargetNode; 
+			if (itr_node == nullptr) return *this; // End of the Tree 
+
+			else if (itr_node->ptr[RCHILD]) {
+				itr_node = itr_node->ptr[RCHILD];
+				while (itr_node->ptr[LCHILD]) {
+					itr_node = itr_node->ptr[LCHILD];
+				}
+				this->m_TargetNode = itr_node; 
+				return *this; 
+			}
+
+			else {
+				Node<T1, T2>* itr_parent = itr_node->ptr[PARENT]; 
+
+				if (itr_parent->ptr[LCHILD] && itr_parent->ptr[LCHILD] == itr_node) {
+					this->m_TargetNode = itr_parent;
+					return *this;
+				}
+
+				while (itr_parent)
+				{
+					if (itr_parent->ptr[RCHILD] && itr_parent->ptr[RCHILD] == itr_node) {
+						itr_node = itr_parent;
+						itr_parent = itr_parent->ptr[PARENT];
+
+					}
+					else if (itr_parent->ptr[LCHILD] && itr_parent->ptr[LCHILD] == itr_node) {
+						this->m_TargetNode = itr_parent;
+						return *this;
+					}
+					else {
+						break; 
+					}
+				}
+
+				this->m_TargetNode = nullptr;
+				return *this;
+			}
 		}
 
 		iterator& operator --()
 		{
-			return *this; 
+			Node<T1, T2>* itr_node = this->m_TargetNode; 
+			if (itr_node == nullptr)
+			{
+				if (this->m_Owner->empty())
+				{
+					return *this; // Empty Node 
+				} 
+				else {
+					// std::cout << "operator-- from end()\n";
+					itr_node = this->m_Owner->m_Root; 
+					while (itr_node->ptr[RCHILD])
+					{
+						itr_node = itr_node->ptr[RCHILD];
+					}
+					this->m_TargetNode = itr_node; 
+					return *this; 
+				}
+			} // edge case handled 
+
+			else if (itr_node->ptr[LCHILD]) {
+				itr_node = itr_node->ptr[LCHILD];
+				while (itr_node->ptr[RCHILD])
+				{
+					itr_node = itr_node->ptr[RCHILD]; 
+				}
+				this->m_TargetNode = itr_node;
+				return *this;
+			}
+
+			else {
+				Node<T1, T2>* itr_parent = itr_node->ptr[PARENT]; 
+
+				if (itr_parent->ptr[RCHILD] && itr_parent->ptr[RCHILD] == itr_node) {
+					this->m_TargetNode = itr_parent;
+					return *this;
+				}
+
+				while (itr_parent)
+				{
+					if (itr_parent->ptr[LCHILD] && itr_parent->ptr[LCHILD] == itr_node) {
+						itr_node = itr_parent; 
+						itr_parent = itr_parent->ptr[PARENT]; 
+					} else if (itr_parent->ptr[RCHILD] && itr_parent->ptr[RCHILD] == itr_node) {
+						this->m_TargetNode = itr_parent;
+						return *this;
+					}
+					else {
+						break;
+					}
+				}
+
+				this->m_TargetNode = nullptr;
+				return *this;
+				
+			}
 		}
 
 	public:

@@ -25,12 +25,20 @@ void BSTreeTest()
 
     std::cout << "\nTree Size: " << tree.size() << "\n";
 
-    
-    /*std::cout << "\nIn-order Traversal:\n";
-    for (auto it = tree.begin(); it != tree.end(); ++it)
+    typename BSTree<int, float>::iterator it = tree.begin();
+
+    std::cout << "\nIn-order Traversal increment:\n";
+    for (; it != tree.end(); ++it)
     {
         std::cout << "Key: " << (*it).key << ", Value: " << (*it).val << "\n";
-    }*/
+    }
+
+    std::cout << "\nIn-order Traversal decrement:\n";
+    for (--it; it != tree.begin(); --it)
+    {
+        std::cout << "Key: " << (*it).key << ", Value: " << (*it).val << "\n";
+    }
+
 
     std::cout << "\nFinding keys:\n";
     int keysToFind[] = { 40, 100, 80 };
