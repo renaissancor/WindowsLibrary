@@ -1,4 +1,4 @@
-#pragma once 
+﻿#pragma once 
 
 #include <iostream>
 #include <cassert>
@@ -24,6 +24,23 @@ struct Node
 {
 	Pair<T1, T2> pair;
 	Node* ptr[3];
+
+public: 
+	bool HasLChild() { return nullptr != ptr[LCHILD]; }
+	bool HasRChild() { return nullptr != ptr[RCHILD]; }
+
+	bool IsRoot() { return nullptr == this->ptr[PARENT]; }
+	bool IsLeft() { return nullptr == this->ptr[LCHILD] && this->ptr[RCHILD]; }
+	bool IsFull() { return this->ptr[LCHILD] && this->ptr[RCHILD] }; 
+
+	bool IsLChild(){ return(ptr[PARENT] && ptr[PARENT]->ptr[LCHILD] == this); }
+	bool IsRChild() { return(ptr[PARENT] && ptr[PARENT]->ptr[RCHILD] == this); }
+
+	Node* GetNode(TYPE _TYPE)
+	{
+		assert(_TYPE != UNDEFINED); 
+		return (this->ptr[_TYPE]); 
+	}
 
 public:
 	Node() :
@@ -62,6 +79,9 @@ public:
 
 	void clear(); 
 	void insert(const Pair<T1, T2>& _pair); 
+
+	Node<T1, T2>* getInOrderSuccessor(Node<T1, T2>* _Node); 
+	Node<T1, T2>* getInOrderPredecessor(Node<T1, T2>* _Node);
 
 	class iterator; 
 	
@@ -118,105 +138,33 @@ public:
 
 		iterator& operator ++()
 		{
-			Node<T1, T2>* itr_node = m_TargetNode; 
-			if (itr_node == nullptr) return *this; // End of the Tree 
-
-			else if (itr_node->ptr[RCHILD]) {
-				itr_node = itr_node->ptr[RCHILD];
-				while (itr_node->ptr[LCHILD]) {
-					itr_node = itr_node->ptr[LCHILD];
-				}
-				this->m_TargetNode = itr_node; 
-				return *this; 
-			}
-
-			else {
-				Node<T1, T2>* itr_parent = itr_node->ptr[PARENT]; 
-
-				if (itr_parent->ptr[LCHILD] && itr_parent->ptr[LCHILD] == itr_node) {
-					this->m_TargetNode = itr_parent;
-					return *this;
-				}
-
-				while (itr_parent)
-				{
-					if (itr_parent->ptr[RCHILD] && itr_parent->ptr[RCHILD] == itr_node) {
-						itr_node = itr_parent;
-						itr_parent = itr_parent->ptr[PARENT];
-
-					}
-					else if (itr_parent->ptr[LCHILD] && itr_parent->ptr[LCHILD] == itr_node) {
-						this->m_TargetNode = itr_parent;
-						return *this;
-					}
-					else {
-						break; 
-					}
-				}
-
-				this->m_TargetNode = nullptr;
-				return *this;
-			}
+			m_TargetNode = m_Owner->getInOrderSuccessor(m_TargetNode); 
+			return *this; 
 		}
 
-		iterator& operator --()
+		iterator& operator--()
 		{
-			Node<T1, T2>* itr_node = this->m_TargetNode; 
-			if (itr_node == nullptr)
+			if (m_TargetNode == nullptr) // we're at end()
 			{
-				if (this->m_Owner->empty())
+				if (m_Owner->empty())
 				{
-					return *this; // Empty Node 
-				} 
-				else {
-					// std::cout << "operator-- from end()\n";
-					itr_node = this->m_Owner->m_Root; 
-					while (itr_node->ptr[RCHILD])
-					{
-						itr_node = itr_node->ptr[RCHILD];
-					}
-					this->m_TargetNode = itr_node; 
-					return *this; 
+					return *this; // still at end() for empty tree
 				}
-			} // edge case handled 
-
-			else if (itr_node->ptr[LCHILD]) {
-				itr_node = itr_node->ptr[LCHILD];
-				while (itr_node->ptr[RCHILD])
+				// Go to rightmost node (max)
+				m_TargetNode = m_Owner->m_Root;
+				while (m_TargetNode->ptr[RCHILD])
 				{
-					itr_node = itr_node->ptr[RCHILD]; 
+					m_TargetNode = m_TargetNode->ptr[RCHILD];
 				}
-				this->m_TargetNode = itr_node;
-				return *this;
+			}
+			else
+			{
+				m_TargetNode = m_Owner->getInOrderPredecessor(m_TargetNode);
 			}
 
-			else {
-				Node<T1, T2>* itr_parent = itr_node->ptr[PARENT]; 
-
-				if (itr_parent->ptr[RCHILD] && itr_parent->ptr[RCHILD] == itr_node) {
-					this->m_TargetNode = itr_parent;
-					return *this;
-				}
-
-				while (itr_parent)
-				{
-					if (itr_parent->ptr[LCHILD] && itr_parent->ptr[LCHILD] == itr_node) {
-						itr_node = itr_parent; 
-						itr_parent = itr_parent->ptr[PARENT]; 
-					} else if (itr_parent->ptr[RCHILD] && itr_parent->ptr[RCHILD] == itr_node) {
-						this->m_TargetNode = itr_parent;
-						return *this;
-					}
-					else {
-						break;
-					}
-				}
-
-				this->m_TargetNode = nullptr;
-				return *this;
-				
-			}
+			return *this;
 		}
+
 
 	public:
 		iterator()
@@ -328,6 +276,111 @@ typename BSTree<T1, T2>::iterator BSTree<T1, T2>::find(const T1& _key)
 
 	return end(); // Not Found
 }
+
+
+template<typename T1, typename T2>
+Node<T1, T2>* BSTree<T1,T2>::getInOrderSuccessor(Node<T1, T2>* _Node)
+{
+	assert(_Node); // If input _Node == nullptr return 
+	Node<T1, T2>* next_node = nullptr;
+	if (_Node->HasRChild())
+	{
+		next_node = _Node->GetNode(RCHILD);
+		while (next_node->GetNode(LCHILD)) { next_node  = next_node->GetNode(LCHILD); }
+	}
+
+	else
+	{
+		Node<T1, T2>* itr_node = _Node;
+		while (!(itr_node->IsRoot()))
+		{
+			if (itr_node->IsLChild()) {
+				next_node = itr_node->GetNode(PARENT);
+				break; 
+			}
+			else {
+				itr_node = itr_node->GetNode(PARENT); 
+			}
+		}
+	}
+	return next_node;
+}
+
+template<typename T1, typename T2>
+Node<T1, T2>* BSTree<T1, T2>::getInOrderPredecessor(Node<T1, T2>* _Node)
+{
+	if (_Node == nullptr) return nullptr;
+
+	// Case 1: Has left child → predecessor is the rightmost of left subtree
+	if (_Node->HasLChild())
+	{
+		Node<T1, T2>* pred_node = _Node->ptr[LCHILD];
+		while (pred_node->ptr[RCHILD])
+		{
+			pred_node = pred_node->ptr[RCHILD];
+		}
+		return pred_node;
+	}
+
+	// Case 2: No left child → walk up until we find a right child
+	Node<T1, T2>* parent = _Node->ptr[PARENT];
+	while (parent && _Node == parent->ptr[LCHILD])
+	{
+		_Node = parent;
+		parent = parent->ptr[PARENT];
+	}
+
+	return parent; // Could be nullptr (i.e., _Node was the leftmost)
+}
+
+
+
+template<typename T1, typename T2>
+typename BSTree<T1, T2>::iterator erase(typename BSTree<T1, T2>::iterator _iter)
+{
+	assert(nullptr != _iter.m_TargetNode); // Check whether the iterator is valid
+	Node<T1,T2>* pSuccessor = nullptr; 
+	if (_iter->m_TargetNode->IsLeaf())
+	{
+		// Delete Node 
+		// 1. If delected node is root 
+		// 2. if delected node is not root 
+		// If parent node is not pointing the node targeted to be deleted 
+		if (_iter->m_TargetNode->IsRoot())
+		{
+			delete _iter->m_TargetNode;
+			m_Root = nullptr;
+		}
+		else
+		{
+			Node<T1, T2>* parent = _iter->m_TargetNode->ptr[PARENT];
+			if (_iter->m_TargetNode->IsLChild())
+			{
+				parent->ptr[LCHILD] = nullptr;
+			}
+			else
+			{
+				parent->ptr[RCHILD] = nullptr;
+			}
+			delete _iter->m_TargetNode;
+		}
+	
+	}
+	else if (_iter->m_TargetNode->IsFull())
+	{
+		// Since both sides are full find either predecessor or successor and replace 
+		// This case find in order successor to replace the original position 
+	}
+	else { // Only one node exists  
+
+	}
+	// Return successor node after the deleted node as iterator and return 
+
+	delete _iter->m_TargetNode; 
+	--this->m_Size; 
+}
+
+// Even after erase iterator in order traversal 
 
 
 void BSTreeTest(); 
