@@ -39,11 +39,11 @@ static unsigned int __stdcall ThreadFunc(void* arg) noexcept {
 	}
 
 	// Make profile directory first 
-	string save_data_txt_path = "profile\\profiler_results_txt_thread_" + std::to_string(thread_id) + ".txt";
+	string save_data_txt_path = ".\\profile\\profiler_results_txt_thread_" + std::to_string(thread_id) + ".txt";
 	Profiler::Manager::GetInstance().SaveDataTXT(save_data_txt_path, Profiler::MILISEC);
-	string save_data_csv_path = "profile\\profiler_results_csv_thread_" + std::to_string(thread_id) + ".csv";
+	string save_data_csv_path = ".\\profile\\profiler_results_csv_thread_" + std::to_string(thread_id) + ".csv";
 	Profiler::Manager::GetInstance().SaveDataCSV(save_data_csv_path, Profiler::MILISEC);
-	string save_func_csv_path = "profile\\profiler_funcall_csv_thread_" + std::to_string(thread_id) + ".csv";
+	string save_func_csv_path = ".\\profile\\profiler_funcall_csv_thread_" + std::to_string(thread_id) + ".csv";
 	Profiler::Manager::GetInstance().SaveFuncCSV(save_func_csv_path);
 
 	return 0;

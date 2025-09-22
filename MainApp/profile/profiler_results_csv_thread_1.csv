@@ -1,0 +1,4 @@
+Function,Calls,Total Time (ms),Average Time (ms),Min Time (ms),Max Time (ms)
+funcA,33,509.451,15.4379,13.8429,17.1627
+funcC,29,0.002,6.89655e-05,0,0.0002
+funcB,38,541.231,14.2429,11.2184,16.2108

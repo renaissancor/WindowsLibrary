@@ -1,0 +1,19 @@
+----------------------------------
+Function funcB Calls : 41
+Total Time   :         580.0220 ms 
+Average Time :          14.1469 ms 
+Min Time     :           6.5888 ms 
+Max Time     :          16.5824 ms 
+----------------------------------
+Function funcA Calls : 31
+Total Time   :         477.7243 ms 
+Average Time :          15.4105 ms 
+Min Time     :          12.2033 ms 
+Max Time     :          17.1982 ms 
+----------------------------------
+Function funcC Calls : 28
+Total Time   :           0.0023 ms 
+Average Time :           0.0001 ms 
+Min Time     :           0.0000 ms 
+Max Time     :           0.0003 ms 
+----------------------------------

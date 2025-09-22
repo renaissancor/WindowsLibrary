@@ -20,9 +20,12 @@
     <ClCompile Include="Sources\pch.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\TestNewTracer.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\TestProfiler.h">
+    <ClInclude Include="Include\TestFunctions.h">
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="Include\pch.h">

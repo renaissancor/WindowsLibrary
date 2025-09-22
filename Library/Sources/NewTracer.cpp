@@ -21,12 +21,12 @@ NewTracer::Carray::Carray(size_t capacity)
     }
 }
 
-NewTracer::Carray::~Carray()
+NewTracer::Carray::~Carray() noexcept
 {
     if (_data) free(_data);
 }
 
-void NewTracer::Carray::reserve(size_t capacity)
+void NewTracer::Carray::reserve(size_t capacity) 
 {
     if (capacity <= _capacity) return;
     Info* new_data = (Info*)malloc(sizeof(Info) * capacity);
@@ -45,7 +45,8 @@ void NewTracer::Carray::reserve(size_t capacity)
     _capacity = capacity;
 }
 
-void NewTracer::Carray::push(void* ptr, size_t size, const char* file, int line)
+void NewTracer::Carray::push(void* ptr, size_t size, 
+    const char* file, int line) noexcept
 {
     if (_size >= _capacity) {
         size_t new_capacity = _capacity > 0 ? _capacity * 2 : 4;
@@ -60,7 +61,7 @@ void NewTracer::Carray::push(void* ptr, size_t size, const char* file, int line)
     }
 }
 
-void NewTracer::Carray::pop(void* ptr)
+void NewTracer::Carray::pop(void* ptr) noexcept
 {
     for (size_t i = 0; i < _size; i++) {
         if (_data[i].ptr == ptr) {
@@ -72,35 +73,35 @@ void NewTracer::Carray::pop(void* ptr)
     }
 }
 
-NewTracer::Info* NewTracer::Carray::at(size_t idx) {
+NewTracer::Info* NewTracer::Carray::at(size_t idx) noexcept {
     if (idx < _size) {
         return &_data[idx];
     }
     return nullptr;
 }
 
-const NewTracer::Info* NewTracer::Carray::at(size_t idx) const {
+const NewTracer::Info* NewTracer::Carray::at(size_t idx) const noexcept {
     if (idx < _size) {
         return &_data[idx];
     }
     return nullptr;
 }
 
-NewTracer::Info* NewTracer::Carray::operator[](size_t idx) {
+NewTracer::Info* NewTracer::Carray::operator[](size_t idx) noexcept {
     if (idx < _size) {
         return &_data[idx];
     }
     return nullptr;
 }
 
-const NewTracer::Info* NewTracer::Carray::operator[](size_t idx) const {
+const NewTracer::Info* NewTracer::Carray::operator[](size_t idx) const noexcept {
     if (idx < _size) {
         return &_data[idx];
     }
     return nullptr;
 }
 
-NewTracer::Carray::iterator NewTracer::Carray::find(void* ptr) {
+NewTracer::Carray::iterator NewTracer::Carray::find(void* ptr) noexcept {
     for (size_t i = 0; i < _size; ++i) {
         if (_data[i].ptr == ptr) {
             return iterator(this, i);
@@ -109,14 +110,15 @@ NewTracer::Carray::iterator NewTracer::Carray::find(void* ptr) {
     return end();
 }
 
-void NewTracer::Manager::NewCheck(void* ptr, size_t size, const char* file, int line)
+void NewTracer::Manager::NewCheck(void* ptr, size_t size, 
+    const char* file, int line) noexcept
 {
     carray.push(ptr, size, file, line);
     printf("[ALLOC] %zu bytes at %p (File: %s, Line: %d)\n",
         size, ptr, file ? file : "(null)", line);
 }
 
-void NewTracer::Manager::DeleteCheck(void* ptr) {
+void NewTracer::Manager::DeleteCheck(void* ptr) noexcept {
     Carray::iterator info = carray.find(ptr);
     if (info == carray.end()) {
         // fprintf(stderr, "[FREE?] pointer not tracked: %p\n", ptr);
@@ -131,7 +133,7 @@ void NewTracer::Manager::DeleteCheck(void* ptr) {
     carray.pop(ptr);
 }
 
-void NewTracer::Manager::ReportLeaks() const {
+void NewTracer::Manager::ReportLeaks() const noexcept {
     if (carray.empty()) {
         printf("No memory leaks detected.\n");
         return;
@@ -151,7 +153,7 @@ void NewTracer::Manager::ReportLeaks() const {
     printf("============================\n");
 }
 
-void NewTracer::Manager::CollectGarbage() {
+void NewTracer::Manager::CollectGarbage() noexcept {
     for (size_t i = 0; i < carray.size(); i++) {
         Info* info = carray.at(i);
         if (info) {
@@ -172,18 +174,18 @@ void* operator new(std::size_t size, const char* file, int line) {
     return ptr;
 }
 
-void* operator new[](std::size_t size, const char* file, int line) {
+void* operator new[](std::size_t size, const char* file, int line) noexcept {
     return operator new(size, file, line);
 }
 
 // operator delete 
-void operator delete(void* ptr) {
+void operator delete(void* ptr) noexcept {
     if (ptr) {
         NewTracer::Manager::GetInstance().DeleteCheck(ptr);
         free(ptr);
     }
 }
-void operator delete[](void* ptr) {
+void operator delete[](void* ptr) noexcept {
     if (ptr) {
         NewTracer::Manager::GetInstance().DeleteCheck(ptr);
         free(ptr);

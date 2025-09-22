@@ -1,10 +1,12 @@
 ﻿#include "pch.h"
 
-#include "TestProfiler.h"
+#include "TestFunctions.h"
 
 int main() {
 
 	std::cout << "Hello, World!" << std::endl; 
-	TestProfiler(); 
+	TestProfiler();
+	TestNewTracer(); 
+	
     return 0;
 }
