@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "NewTracer.h"
 
 NewTracer::Carray::Carray()

@@ -1,5 +1,6 @@
+#include "pch.h"
+
 #include "Profiler.h" 
-#include <process.h> 
 
 struct ThreadParam {
 	int id;
@@ -43,7 +44,7 @@ static unsigned int __stdcall ThreadFunc(void* arg) noexcept {
 	string save_data_csv_path = "profile\\profiler_results_csv_thread_" + std::to_string(thread_id) + ".csv";
 	Profiler::Manager::GetInstance().SaveDataCSV(save_data_csv_path, Profiler::MILISEC);
 	string save_func_csv_path = "profile\\profiler_funcall_csv_thread_" + std::to_string(thread_id) + ".csv";
-	Profiler::Manager::GetInstance().SaveFuncCSV(save_func_csv_path, Profiler::NANOSEC);
+	Profiler::Manager::GetInstance().SaveFuncCSV(save_func_csv_path);
 
 	return 0;
 }
@@ -89,7 +90,7 @@ int TestProfiler() noexcept {
 			continue;
 		}
 		printf("Contents of %s:\n", path.c_str());
-		char buffer[256];
+		// char buffer[256] = { 0, }; 
 		while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
 			printf("%s", buffer);
 		}

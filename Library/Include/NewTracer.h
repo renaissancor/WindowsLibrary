@@ -1,11 +1,5 @@
 #pragma once
 
-#include <unordered_map>
-#include <cstdio>
-#include <cstdlib>
-#include <new>
-#include <cstdint>
-
 namespace NewTracer {
 
     struct Info {         // 32Bit 64Bit 
@@ -76,7 +70,7 @@ namespace NewTracer {
                 }
                 else {
                     carray = nullptr;
-                    index = -1;
+                    index = INT_MAX;
                 }
                 return *this;
             }
@@ -91,7 +85,7 @@ namespace NewTracer {
         };
 
         iterator begin() { return iterator(this, 0); }
-        iterator end() { return iterator(nullptr, -1); }
+        iterator end() { return iterator(nullptr, INT_MAX); }
         iterator find(void* ptr);
     };
 

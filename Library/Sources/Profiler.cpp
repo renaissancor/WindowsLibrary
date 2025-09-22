@@ -1,3 +1,5 @@
+#include "pch.h"
+
 #include "profiler.h"
 
 // Profiler.cpp 
@@ -17,7 +19,7 @@ void Profiler::Manager::AddProfile
 void Profiler::Manager::PrintConsoleTick() const noexcept
 {
 	QueryPerformanceFrequency(&_frequency);
-	long double frequency = static_cast<long double>(_frequency.QuadPart);
+	// long double frequency = static_cast<long double>(_frequency.QuadPart);
 
 	printf("----------------------------------\n");
 	for (const auto& pair : _func_map) {
@@ -180,7 +182,7 @@ void Profiler::Manager::SaveDataCSV(const string& filepath, Unit unit) noexcept
 	}
 }
 
-void Profiler::Manager::SaveFuncCSV(const string& filepath, Unit unit) noexcept
+void Profiler::Manager::SaveFuncCSV(const string& filepath) noexcept
 {
 	std::ofstream ofs(filepath);
 	if (!ofs.is_open()) {

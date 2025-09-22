@@ -1,9 +1,10 @@
-﻿#include "TestProfiler.h"
-#include <iostream>
+﻿#include "pch.h"
+
+#include "TestProfiler.h"
 
 int main() {
 
 	std::cout << "Hello, World!" << std::endl; 
-	return TestProfiler(); 
+	TestProfiler(); 
     return 0;
 }

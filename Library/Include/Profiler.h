@@ -1,19 +1,6 @@
 #pragma once 
 
-#include <iostream>
-#include <vector>
-#include <cstdio>
-#include <cstdlib>
-#include <conio.h>
-#include <unordered_map> 
-#include <wtypes.h> 
-#include <string> 
-#include <fstream>
-#include <iomanip>
-#include <windows.h> 
-#include <cstring> 
-
-// Profiler.hpp 
+// Profiler.h 
 
 using std::vector;
 using std::string;
@@ -83,7 +70,7 @@ namespace Profiler {
 
 		void SaveDataTXT(const string& filepath, Unit unit) noexcept;
 		void SaveDataCSV(const string& filepath, Unit unit) noexcept;
-		void SaveFuncCSV(const string& filepath, Unit unit) noexcept;
+		void SaveFuncCSV(const string& filepath) noexcept;
 	};
 
 	class EnterSection {

@@ -1,27 +1,3 @@
-## User-specific files
-*.user
-*.suo
-*.userosscache
-*.sln.docstates
-
-## Build results
-[Bb]in/
-[Oo]bj/
-[Ll]og/
-*.log
-
-## VS temp files
-.vs/
-*.dbmdl
-*.VC.db
-*.vscode/
-
-## Auto-generated files
-Generated\ Files/
-
-## x64 
-x64 
-DataStructure/x64 
-
-# out
-Execute 
+.vs 
+Debug
+Execute
