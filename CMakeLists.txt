@@ -1,14 +1,12 @@
-cmake_minimum_required(VERSION 3.15)
-project(DataStructure)
+# Root CMakeLists.txt 
+
+cmake_minimum_required(VERSION 3.10)
+project(WindowsLibrary)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Include headers from include/
-include_directories(include)
+add_subdirectory(Library)
+add_subdirectory(Sources)
 
-# Add your source files
-add_executable(DataStructure
-    src/main.cpp
-    src/BSTree.cpp
-    # add more cpp files here if needed
-)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Execute/${CMAKE_VS_PLATFORM_NAME})
