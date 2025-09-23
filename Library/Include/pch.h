@@ -17,3 +17,4 @@
 #include <process.h> 
 #include <atomic> 
 #include <cstddef>
+#include <winnt.h>

@@ -1,16 +1,17 @@
 // SPSCQueue.h 
 #pragma once 
 
-using std::atomic; 
+#include <wtypes.h>
 
 template<typename T>
 class SPSCQueue {
 private:
 	constexpr static const size_t CACHE_LINE_SIZE = 64; 
-	alignas(CACHE_LINE_SIZE) atomic<size_t> _head{ 0 };
-	alignas(CACHE_LINE_SIZE) atomic<size_t> _tail{ 0 };
+	alignas(CACHE_LINE_SIZE) volatile LONG _head{ 0 };
+	alignas(CACHE_LINE_SIZE) volatile LONG _tail{ 0 };
 	T* _buffer;
 	size_t _capacity;
+
 public:
 	explicit SPSCQueue(size_t capacity) 
 		: _capacity(capacity) {
@@ -22,7 +23,6 @@ public:
 	}
 
 	bool Push(const T& item);
-	 
 	bool Pop(T& item);
 	const T* Front(); 
 	const T* PopFront(); 
@@ -31,37 +31,34 @@ public:
 
 template<typename T>
 bool SPSCQueue<T>::Push(const T& item) {
-	const size_t current_tail = _tail.load(std::memory_order_relaxed);
-	const size_t current_head = _head.load(std::memory_order_relaxed);
-
+	const LONG current_head = _head;
+	const LONG current_tail = _tail;
 	const size_t next_tail = (current_tail + 1) % _capacity;
 	if (next_tail == current_head) {
-		// Queue is full 
 		return false;
 	}
-
 	_buffer[current_tail] = item;
-	_tail.store(next_tail, std::memory_order_release);
+	_InterlockedExchange((LONG volatile*)&_tail, next_tail);
 	return true;
 }
 
 template<typename T>
 bool SPSCQueue<T>::Pop(T& item) {
-	const size_t current_head = _head.load(std::memory_order_relaxed);
-	const size_t current_tail = _tail.load(std::memory_order_relaxed);
+	const LONG current_head = _head;
+	const LONG current_tail = _tail;
 	if (current_head == current_tail) {
 		return false;
 	}
 	item = _buffer[current_head];
 	const size_t next_head = (current_head + 1) % _capacity;
-	_head.store(next_head, std::memory_order_release);
+	_InterlockedExchange((LONG volatile*)&_head, next_head);
 	return true;
 }
 
 template<typename T>
 const T* SPSCQueue<T>::Front() {
-	const size_t current_head = _head.load(std::memory_order_relaxed);
-	const size_t current_tail = _tail.load(std::memory_order_acquire);
+	const LONG current_head = _head;
+	const LONG current_tail = _tail; 
 	if (current_head == current_tail) {
 		return nullptr;
 	}
@@ -70,13 +67,13 @@ const T* SPSCQueue<T>::Front() {
 
 template<typename T>
 const T* SPSCQueue<T>::PopFront() {
-	const size_t current_head = _head.load(std::memory_order_relaxed);
-	const size_t current_tail = _tail.load(std::memory_order_acquire);
-	if (current_head == current_tail) {
+	const LONG current_head = _head;
+	const LONG current_tail = _tail;
+	if(current_head == current_tail) {
 		return nullptr;
 	}
 	const T* item = &_buffer[current_head];
-	const size_t next_head = (current_head + 1) % _capacity;
-	_head.store(next_head, std::memory_order_release);
+	const size_t next_head = (current_head + 1) % _capacity; 
+	_InterlockedExchange((LONG volatile*)&_head, next_head);
 	return item;
 }
