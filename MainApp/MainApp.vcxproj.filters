@@ -23,6 +23,9 @@
     <ClCompile Include="Sources\TestNewTracer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\TestSPSCQueue.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\TestFunctions.h">

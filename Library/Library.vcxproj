@@ -171,6 +171,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\SPSCQueue.h" />
     <ClInclude Include="Include\NewTracer.h" />
     <ClInclude Include="Include\pch.h" />
     <ClInclude Include="Include\Profiler.h" />

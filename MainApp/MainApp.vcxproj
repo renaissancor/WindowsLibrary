@@ -193,6 +193,7 @@
     <ClCompile Include="Sources\pch.cpp" />
     <ClCompile Include="Sources\TestNewTracer.cpp" />
     <ClCompile Include="Sources\TestProfiler.cpp" />
+    <ClCompile Include="Sources\TestSPSCQueue.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\pch.h" />

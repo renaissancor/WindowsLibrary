@@ -20,6 +20,9 @@
     <ClInclude Include="Include\pch.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\SPSCQueue.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NewTracer.cpp">

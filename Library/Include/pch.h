@@ -15,3 +15,5 @@
 #include <new>
 #include <cstdint>
 #include <process.h> 
+#include <atomic> 
+#include <cstddef>

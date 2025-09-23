@@ -4,9 +4,10 @@
 
 int main() {
 
-	std::cout << "Hello, World!" << std::endl; 
-	TestProfiler();
-	TestNewTracer(); 
-	
+	// std::cout << "Hello, World!" << std::endl; 
+	// TestProfiler();
+	// TestNewTracer(); 
+	TestSPSCQueue(); 
+
     return 0;
 }
