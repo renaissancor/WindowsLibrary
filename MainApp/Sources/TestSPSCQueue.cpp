@@ -3,14 +3,14 @@
 #include "SPSCQueue.h"
 #include "TestFunctions.h" 
 
-struct ThreadParam {
+struct SPSCParam {
 	SPSCQueue<int>* queue;
 	const int total_items;
 	std::vector<int>* consumed_items;
 };
 
-static unsigned int __stdcall ConsumerThread(void* arg) noexcept {
-	ThreadParam* param = static_cast<ThreadParam*>(arg);
+static unsigned int __stdcall SPSCConsumerThread(void* arg) noexcept {
+	SPSCParam* param = static_cast<SPSCParam*>(arg);
 	SPSCQueue<int>* queue = param->queue;
 	int received_count = 0;
 	while (received_count < param->total_items) {
@@ -26,8 +26,8 @@ static unsigned int __stdcall ConsumerThread(void* arg) noexcept {
 	return 0;
 }
 
-static unsigned int __stdcall ProducerThread(void* arg) noexcept {
-	ThreadParam* param = static_cast<ThreadParam*>(arg);
+static unsigned int __stdcall SPSCProducerThread(void* arg) noexcept {
+	SPSCParam* param = static_cast<SPSCParam*>(arg);
 	SPSCQueue<int>* queue = param->queue;
 	for (int i = 0; i < param->total_items; ++i) {
 		while (!queue->Push(i)) {
@@ -38,53 +38,56 @@ static unsigned int __stdcall ProducerThread(void* arg) noexcept {
 }
 
 void TestSPSCQueue() {
-	const int capacity = 1024;
-	SPSCQueue<int> queue(capacity);
+    const int capacity = 1024;
+    const int total_items = 1000000;
 
-	const int total_items = 1000000;
-	std::vector<int> consumed_items;
+    for (int round = 0; round < 5; ++round) {
+        SPSCQueue<int> queue(capacity);
+        std::vector<int> consumed_items;
+        consumed_items.reserve(total_items);
 
-	ThreadParam *param = new ThreadParam{ &queue, total_items, &consumed_items };
+        SPSCParam* param = new SPSCParam{ &queue, total_items, &consumed_items };
 
-	HANDLE ConsumerThreadHandle = (HANDLE)_beginthreadex(
-		nullptr, 0, &ConsumerThread, param, 0, nullptr);
-	HANDLE ProducerThreadHandle = (HANDLE)_beginthreadex(
-		nullptr, 0, &ProducerThread, param, 0, nullptr);
-	if (ConsumerThreadHandle == nullptr || ProducerThreadHandle == nullptr) {
-		fprintf_s(stderr, "Error creating threads.\n");
-		return;
-	}
+        HANDLE consumerHandle = (HANDLE)_beginthreadex(
+            nullptr, 0, &SPSCConsumerThread, param, 0, nullptr);
+        HANDLE producerHandle = (HANDLE)_beginthreadex(
+            nullptr, 0, &SPSCProducerThread, param, 0, nullptr);
+        if (!consumerHandle || !producerHandle) {
+            std::cerr << "Error: Unable to create threads.\n";
+            return;
+        }
+        
+        WaitForSingleObject(consumerHandle, INFINITE);
+        WaitForSingleObject(producerHandle, INFINITE);
 
-	WaitForSingleObject(ConsumerThreadHandle, INFINITE);
-	WaitForSingleObject(ProducerThreadHandle, INFINITE); 
+        CloseHandle(consumerHandle);
+        CloseHandle(producerHandle);
 
-	CloseHandle(ConsumerThreadHandle);
-	CloseHandle(ProducerThreadHandle); 
+        bool success = true;
 
-	bool success = true;
-	if (consumed_items.size() != total_items) {
-		std::cout << "Error: Received item count mismatch! Expected: " << total_items
-			<< ", Got: " << consumed_items.size() << std::endl;
-		success = false;
-	}
+        if (consumed_items.size() != total_items) {
+            std::cout << "[Round " << round << "] Error: Size mismatch. Expected "
+                << total_items << ", Got " << consumed_items.size() << "\n";
+            success = false;
+        }
 
-	if (success) {
-		for (int i = 0; i < total_items; ++i) {
-			if (consumed_items[i] != i) {
-				std::cout << "Error: Data order mismatch at index " << i
-					<< ". Expected: " << i << ", Got: " << consumed_items[i] << std::endl;
-				success = false;
-				break;
-			}
-		}
-	}
+        for (int i = 0; i < (int)consumed_items.size(); ++i) {
+            if (consumed_items[i] != i) {
+                std::cout << "[Round " << round << "] Error: Order mismatch at index "
+                    << i << ". Expected " << i << ", Got " << consumed_items[i] << "\n";
+                success = false;
+                break;
+            }
+        }
 
-	if (success) {
-		std::cout << "SPSC Queue Test Passed! All " << total_items << " items processed correctly." << std::endl;
-	}
-	else {
-		std::cout << "SPSC Queue Test Failed!" << std::endl;
-	}
+        if (success) {
+            std::cout << "[Round " << round << "] Test Passed! "
+                << total_items << " items processed correctly.\n";
+        }
+        else {
+            std::cout << "[Round " << round << "] Test Failed!\n";
+        }
 
-	delete param; 
+        delete param;
+    }
 }

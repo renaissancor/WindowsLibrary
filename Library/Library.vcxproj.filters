@@ -23,6 +23,12 @@
     <ClInclude Include="Include\SPSCQueue.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\MPSCQueue.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\SPMCQueue.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NewTracer.cpp">
