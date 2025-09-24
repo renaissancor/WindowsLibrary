@@ -172,6 +172,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Include\MPSCQueue.h" />
+    <ClInclude Include="Include\ro_hash_map.h" />
     <ClInclude Include="Include\SPMCQueue.h" />
     <ClInclude Include="Include\SPSCQueue.h" />
     <ClInclude Include="Include\NewTracer.h" />
@@ -187,6 +188,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Sources\Profiler.cpp" />
+    <ClCompile Include="Sources\ro_hash_map.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

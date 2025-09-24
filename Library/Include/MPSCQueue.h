@@ -34,10 +34,11 @@ bool MPSCQueue<T>::Push(const T& item) {
 
     size_t current_head = _head;
     if (((current_tail + 1) % _capacity) == current_head) {
+		InterlockedDecrement64((volatile LONG64*)&_tail); 
         return false; 
     }
-
     _buffer[next_tail] = item;
+    MemoryBarrier(); 
     return true;
 }
 
@@ -49,10 +50,9 @@ bool MPSCQueue<T>::Pop(T& item) {
     if (current_head == current_tail) {
         return false; 
     }
-
     size_t next_head = (current_head + 1) % _capacity;
+    MemoryBarrier(); 
     item = _buffer[current_head % _capacity];
-
     _head = next_head;
     return true;
 }

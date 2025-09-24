@@ -34,8 +34,9 @@ bool SPMCQueue<T>::Push(const T& item) {
     if (next_tail == current_head) {
         return false; 
     }
-
+	MemoryBarrier(); 
     _buffer[current_tail] = item;
+	MemoryBarrier(); 
 	_tail = next_tail; // Producer Single No Atomics Needed
     return true;
 }

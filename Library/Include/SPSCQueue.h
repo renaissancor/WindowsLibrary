@@ -26,10 +26,10 @@ public:
 	bool Push(const T& item);
 	bool Pop(T& item);
 	const T* Front(); 
-	const T* PopFront(); 
+	const T* PopPtr(); 
 }; 
 
-
+// Only Single Producer Thread Calls Push 
 template<typename T>
 bool SPSCQueue<T>::Push(const T& item) {
 	const size_t current_head = _head;
@@ -39,19 +39,23 @@ bool SPSCQueue<T>::Push(const T& item) {
 		return false;
 	}
 	_buffer[current_tail] = item;
+	MemoryBarrier();
 	_tail = next_tail;
 	return true;
 }
 
+// Only Single Consumer Thread Calls Pop 
 template<typename T>
 bool SPSCQueue<T>::Pop(T& item) {
 	const size_t current_head = _head;
 	const size_t current_tail = _tail;
+	MemoryBarrier();
 	if (current_head == current_tail) {
 		return false;
 	}
 	item = _buffer[current_head];
 	const size_t next_head = (current_head + 1) % _capacity;
+	
 	_head = next_head; 
 	return true;
 }
@@ -67,14 +71,12 @@ const T* SPSCQueue<T>::Front() {
 }
 
 template<typename T>
-const T* SPSCQueue<T>::PopFront() {
+const T* SPSCQueue<T>::PopPtr() {
 	const size_t current_head = _head;
 	const size_t current_tail = _tail;
-	if(current_head == current_tail) {
-		return nullptr;
-	}
-	const T* item = &_buffer[current_head];
-	const size_t next_head = (current_head + 1) % _capacity; 
-	_head = next_head;
+	MemoryBarrier();
+	if(current_head == current_tail) return nullptr;
+	T* item = &_buffer[current_head];
+	_head = (current_head + 1) % _capacity;
 	return item;
 }

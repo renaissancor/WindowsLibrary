@@ -9,10 +9,13 @@ int main() {
 	// TestNewTracer(); 
 	// TestSPSCQueue(); 
 
-	TestMPSCQueue();
+	// TestMPSCQueue();
 	
 	// SPMC is not working properly yet 
 	// TestSPMCQueue();
+
+	// test_ro_hash_map(); 
+	test_ro_hash_map_performance(); 
 
     return 0;
 }

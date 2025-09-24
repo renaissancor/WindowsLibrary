@@ -29,6 +29,9 @@
     <ClInclude Include="Include\SPMCQueue.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\ro_hash_map.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NewTracer.cpp">
@@ -38,6 +41,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\pch.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\ro_hash_map.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

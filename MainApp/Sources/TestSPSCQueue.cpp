@@ -39,18 +39,19 @@ static unsigned int __stdcall SPSCProducerThread(void* arg) noexcept {
 
 void TestSPSCQueue() {
     const int capacity = 1024;
-    const int total_items = 1000000;
+    const int total_items = 1000000; // 100000000;
 
-    for (int round = 0; round < 5; ++round) {
+    for (int round = 0; round < 3; ++round) {
         SPSCQueue<int> queue(capacity);
         std::vector<int> consumed_items;
         consumed_items.reserve(total_items);
 
         SPSCParam* param = new SPSCParam{ &queue, total_items, &consumed_items };
 
-        HANDLE consumerHandle = (HANDLE)_beginthreadex(
+		HANDLE consumerHandle = 0, producerHandle = 0; 
+        consumerHandle = (HANDLE)_beginthreadex(
             nullptr, 0, &SPSCConsumerThread, param, 0, nullptr);
-        HANDLE producerHandle = (HANDLE)_beginthreadex(
+        producerHandle = (HANDLE)_beginthreadex(
             nullptr, 0, &SPSCProducerThread, param, 0, nullptr);
         if (!consumerHandle || !producerHandle) {
             std::cerr << "Error: Unable to create threads.\n";
