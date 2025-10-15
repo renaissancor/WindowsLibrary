@@ -8,7 +8,8 @@ void test_ro_hash_map_performance() noexcept {
     // 1) 런타임에 uintptr_t 키 생성
     std::vector<uintptr_t> raw_keys(N);
     for (size_t i = 0; i < N; ++i) {
-		raw_keys[i] = (i * 2654435761) % 4294967291; // Knuth's multiplicative hash
+		// raw_keys[i] = (i * 2654435761) % 4294967291; // Knuth's multiplicative hash
+        raw_keys[i] = i * 60 + 7; // Collision Performance Test 
     }
 
     // 2) ro_hash_map 테스트

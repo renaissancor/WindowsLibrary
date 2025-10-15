@@ -18,5 +18,8 @@
     <ClCompile Include="Architecture.cpp">
       <Filter>소스 파일</Filter>
     </ClCompile>
+    <ClCompile Include="TryCatch.cpp">
+      <Filter>소스 파일</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

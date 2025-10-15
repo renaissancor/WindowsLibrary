@@ -17,6 +17,11 @@ namespace jhp {
 		Node** _bucket; 
 
 		inline size_t HashFunc(const char* key) const noexcept {
+			size_t sum = 0; 
+			for (const char* i = key; i != nullptr; ++i) {
+				sum += *(i);
+			}
+
 			size_t hash = reinterpret_cast<size_t>(key); 
 			hash = (hash >> 3) ^ (hash >> 11);
 			return hash % _capacity;

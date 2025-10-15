@@ -171,6 +171,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\GuardOverflow.h" />
     <ClInclude Include="Include\MPSCQueue.h" />
     <ClInclude Include="Include\ro_hash_map.h" />
     <ClInclude Include="Include\SPMCQueue.h" />
@@ -180,6 +181,7 @@
     <ClInclude Include="Include\Profiler.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\GuardOverflow.cpp" />
     <ClCompile Include="Sources\NewTracer.cpp" />
     <ClCompile Include="Sources\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

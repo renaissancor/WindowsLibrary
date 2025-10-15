@@ -191,6 +191,7 @@
   <ItemGroup>
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\pch.cpp" />
+    <ClCompile Include="Sources\TestGuardOverflow.cpp" />
     <ClCompile Include="Sources\TestMPSCQueue.cpp" />
     <ClCompile Include="Sources\TestNewTracer.cpp" />
     <ClCompile Include="Sources\TestProfiler.cpp" />
