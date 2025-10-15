@@ -28,17 +28,17 @@ namespace GuardOverflow {
 			return instance; 
 		}
 		
-		LPVOID Alloc(size_t bytes_to_alloc) noexcept;
-		void Free(LPVOID ptr) noexcept;
+		LPVOID CustomAlloc(size_t bytes_to_alloc) noexcept;
+		void CustomFree(LPVOID ptr) noexcept;
 		
 	};
 
 	inline LPVOID Alloc(size_t bytes_to_alloc) noexcept {
-		return Manager::GetInstance().Alloc(bytes_to_alloc); 
+		return Manager::GetInstance().CustomAlloc(bytes_to_alloc);
 	}
 
-	void Free(LPVOID ptr) noexcept {
-		Manager::GetInstance().Free(ptr); 
+	inline void Free(LPVOID ptr) noexcept {
+		Manager::GetInstance().CustomFree(ptr);
 		return; 
 	}
 }

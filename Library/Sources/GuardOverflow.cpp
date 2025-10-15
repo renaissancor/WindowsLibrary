@@ -24,7 +24,7 @@ void GuardOverflow::Manager::FreeAllMemory() noexcept {
 	_info.clear();
 }
 
-LPVOID GuardOverflow::Manager::Alloc(size_t bytes_to_alloc) noexcept {
+LPVOID GuardOverflow::Manager::CustomAlloc(size_t bytes_to_alloc) noexcept {
 	if (bytes_to_alloc == 0) return NULL;
 	EnterCriticalSection(&_cs);
 	const size_t PAGE = _page_size;
@@ -53,7 +53,7 @@ LPVOID GuardOverflow::Manager::Alloc(size_t bytes_to_alloc) noexcept {
 // Note: Returned pointer is not page base, it's placed before the guard page.
 // You must pass the same pointer to GuardOverflow::Free().
 
-void GuardOverflow::Manager::Free(LPVOID ptr) noexcept {
+void GuardOverflow::Manager::CustomFree(LPVOID ptr) noexcept {
 	if (!ptr) return;
 	EnterCriticalSection(&_cs);
 	auto it = _info.find((uintptr_t)ptr);
