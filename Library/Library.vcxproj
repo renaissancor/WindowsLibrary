@@ -179,8 +179,10 @@
     <ClInclude Include="Include\NewTracer.h" />
     <ClInclude Include="Include\pch.h" />
     <ClInclude Include="Include\Profiler.h" />
+    <ClInclude Include="RingBuffer.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="RingBuffer.cpp" />
     <ClCompile Include="Sources\GuardOverflow.cpp" />
     <ClCompile Include="Sources\NewTracer.cpp" />
     <ClCompile Include="Sources\pch.cpp">

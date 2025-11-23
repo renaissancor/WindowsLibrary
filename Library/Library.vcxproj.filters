@@ -35,6 +35,9 @@
     <ClInclude Include="Include\GuardOverflow.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="RingBuffer.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NewTracer.cpp">
@@ -50,6 +53,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\GuardOverflow.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="RingBuffer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>
