@@ -29,13 +29,19 @@
     <ClInclude Include="Include\GuardOverflow.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="RingBuffer.h">
+    <ClInclude Include="Include\RingBuffer.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="WinAtomic.h">
+    <ClInclude Include="Include\UniquePtr.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="WinMutex.h">
+    <ClInclude Include="Include\WinAtomic.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\WinMutex.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\WinThread.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -55,10 +61,13 @@
     <ClCompile Include="Sources\GuardOverflow.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="RingBuffer.cpp">
+    <ClCompile Include="Sources\RingBuffer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="whatever.cpp">
+    <ClCompile Include="Sources\whatever.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\WinThread.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

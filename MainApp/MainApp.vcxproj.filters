@@ -29,6 +29,9 @@
     <ClCompile Include="Sources\TestGuardOverflow.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\TestWinThread.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\TestFunctions.h">

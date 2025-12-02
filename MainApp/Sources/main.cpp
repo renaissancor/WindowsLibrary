@@ -19,7 +19,9 @@ int main() {
 
 	// __debugbreak(); 
 
-	test_guard_overflow(); 
+	// test_guard_overflow(); 
+
+	test_win_thread(); 
 
     return 0;
 }

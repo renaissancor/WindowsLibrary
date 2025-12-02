@@ -14,6 +14,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution", "Solution", "{2A
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Backups", "Backups", "{902445FD-FFFF-4FB9-BE85-3315FB3D179B}"
+	ProjectSection(SolutionItems) = preProject
+		Backups\BSTree.h = Backups\BSTree.h
+		Backups\BSTreeTest.cpp = Backups\BSTreeTest.cpp
+		Backups\DArray.h = Backups\DArray.h
+		Backups\darray2.h = Backups\darray2.h
+		Backups\DLList.h = Backups\DLList.h
+		Backups\PQHeap.h = Backups\PQHeap.h
+		Backups\PQHeapTest.cpp = Backups\PQHeapTest.cpp
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64

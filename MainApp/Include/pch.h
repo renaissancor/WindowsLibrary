@@ -18,3 +18,7 @@
 #include <chrono>
 #include <array>
 #include <utility>
+#include <functional>
+#include <atomic>
+#include <process.h>
+#include <stdexcept>
