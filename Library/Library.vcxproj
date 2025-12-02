@@ -172,14 +172,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Include\GuardOverflow.h" />
-    <ClInclude Include="Include\MPSCQueue.h" />
     <ClInclude Include="Include\ro_hash_map.h" />
-    <ClInclude Include="Include\SPMCQueue.h" />
-    <ClInclude Include="Include\SPSCQueue.h" />
     <ClInclude Include="Include\NewTracer.h" />
     <ClInclude Include="Include\pch.h" />
     <ClInclude Include="Include\Profiler.h" />
     <ClInclude Include="RingBuffer.h" />
+    <ClInclude Include="WinAtomic.h" />
+    <ClInclude Include="WinMutex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RingBuffer.cpp" />
@@ -193,6 +192,10 @@
     </ClCompile>
     <ClCompile Include="Sources\Profiler.cpp" />
     <ClCompile Include="Sources\ro_hash_map.cpp" />
+    <ClCompile Include="whatever.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SPSCMPSCSPMC.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

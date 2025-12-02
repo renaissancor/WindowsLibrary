@@ -1,71 +1,73 @@
 #include "pch.h"
 #include "RingBuffer.h"
 
-RingBuffer::RingBuffer(int bufferCapacity)
-	: _buffer(nullptr), _capacity(bufferCapacity), 
-	_head(0), _tail(0), _size(0)
+// RingBuffer.cpp
+
+RingBuffer::RingBuffer(int capacity)
+	: _capacity(capacity), _head(0), _tail(0)
 {
+	if (_capacity < 4) _capacity = 4;
 	_buffer = new char[_capacity];
 }
 
-RingBuffer::~RingBuffer(void)
+RingBuffer::~RingBuffer()
 {
-	if (_buffer) {
-		delete[] _buffer;
-		_buffer = nullptr;
-	}
+	delete[] _buffer;
 }
 
-int RingBuffer::Enqueue(const char* data, int size)
-{
-	if (size <= 0) return 0;
-	if (size > GetFreeSize()) {
-		size = GetFreeSize();
-	}
-	int firstChunkSize = min(size, _capacity - _tail);
-	memcpy_s(_buffer + _tail, _capacity - _tail, data, firstChunkSize);
-
-	_tail = (_tail + firstChunkSize) % _capacity;
-	int remainingSize = size - firstChunkSize;
-	if (remainingSize > 0) {
-		memcpy_s(_buffer + _tail, _capacity - _tail, data + firstChunkSize, remainingSize);
-		_tail = (_tail + remainingSize) % _capacity;
-	}
-	_size += size;
-	return size;
+void RingBuffer::ResizeBuffer(const int newCapacity) noexcept {
+	if (newCapacity <= _capacity) return;
+	char* newBuffer = new char[newCapacity]; // can throw bad_alloc 
+	int usedSize = GetUsedSize();
+	Peek(newBuffer, usedSize);
+	delete[] _buffer;
+	_buffer = newBuffer;
+	_capacity = newCapacity;
+	_head = 0;
+	_tail = usedSize;
 }
 
-int RingBuffer::Dequeue(char* data, int size) 
-{
-	if (size <= 0) return 0;
-	if (size > GetUsedSize()) {
-		size = GetUsedSize();
+int RingBuffer::Enqueue(const char* src, int bytes) noexcept {
+	if (bytes > GetFreeSize()) {
+		int newCapacity = _capacity * 2; 
+		while (newCapacity - GetUsedSize() - 1 < bytes) newCapacity *= 2;
+		ResizeBuffer(newCapacity); 
 	}
-	int firstChunkSize = min(size, _capacity - _head);
-	memcpy_s(data, size, _buffer + _head, firstChunkSize);  // destination: data, source: _buffer + _head
-	_head = (_head + firstChunkSize) % _capacity;
-	int remainingSize = size - firstChunkSize;
-	if (remainingSize > 0) {
-		memcpy_s(data + firstChunkSize, remainingSize, _buffer + _head, remainingSize);
-		_head = (_head + remainingSize) % _capacity;
+	int firstChunk = min(bytes, DirectEnqueueSize());
+	memcpy_s(_buffer + _tail, _capacity - _tail, src, firstChunk);
+	int remaining = bytes - firstChunk;
+	if (remaining == 0) {
+		_tail = (_tail + firstChunk) % _capacity;
 	}
-	_size -= size;
-	return size;
+	else {
+		memcpy_s(_buffer, _capacity, src + firstChunk, remaining);
+		_tail = remaining;
+	}
+	return bytes;
 }
 
-int RingBuffer::Peek(char* data, int size) const 
-{
-	if (size <= 0) return 0;
-	if (size > GetUsedSize()) {
-		size = GetUsedSize();
+int RingBuffer::Dequeue(char* dst, int bytes) noexcept {
+	if (bytes > GetUsedSize()) bytes = GetUsedSize();
+	int firstChunk = min(bytes, _capacity - _head);
+	memcpy_s(dst, bytes, _buffer + _head, firstChunk);
+	int remaining = bytes - firstChunk;
+	if (remaining == 0) {
+		_head = (_head + firstChunk) % _capacity;
 	}
-	int tempHead = _head;
-	int firstChunkSize = min(size, _capacity - tempHead);
-	memcpy_s(data, size, _buffer + _head, firstChunkSize);  // destination: data, source: _buffer + _head
-	tempHead = (tempHead + firstChunkSize) % _capacity;
-	int remainingSize = size - firstChunkSize;
-	if (remainingSize > 0) {
-		memcpy_s(data + firstChunkSize, remainingSize, _buffer + _head, remainingSize);
+	else {
+		memcpy_s(dst + firstChunk, bytes - firstChunk, _buffer, remaining);
+		_head = remaining;
 	}
-	return size;
+	return bytes;
+}
+
+int RingBuffer::Peek(char* dst, int bytes) const noexcept {
+	if (bytes > GetUsedSize()) bytes = GetUsedSize();
+	int firstChunk = min(bytes, _capacity - _head);
+	memcpy_s(dst, bytes, _buffer + _head, firstChunk);
+	int remaining = bytes - firstChunk;
+	if (remaining > 0) {
+		memcpy_s(dst + firstChunk, bytes - firstChunk, _buffer, remaining);
+	}
+	return bytes;
 }

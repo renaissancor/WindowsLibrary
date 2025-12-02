@@ -9,6 +9,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="Record">
+      <UniqueIdentifier>{8c072a4d-2247-4a14-a364-e4f90901b862}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\NewTracer.h">
@@ -20,15 +23,6 @@
     <ClInclude Include="Include\pch.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="Include\SPSCQueue.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\MPSCQueue.h">
-      <Filter>Include</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\SPMCQueue.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="Include\ro_hash_map.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -36,6 +30,12 @@
       <Filter>Include</Filter>
     </ClInclude>
     <ClInclude Include="RingBuffer.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="WinAtomic.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="WinMutex.h">
       <Filter>Include</Filter>
     </ClInclude>
   </ItemGroup>
@@ -58,5 +58,13 @@
     <ClCompile Include="RingBuffer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="whatever.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SPSCMPSCSPMC.txt">
+      <Filter>Record</Filter>
+    </Text>
   </ItemGroup>
 </Project>
