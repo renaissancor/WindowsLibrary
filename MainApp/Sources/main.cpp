@@ -5,7 +5,7 @@
 int main() {
 
 	// std::cout << "Hello, World!" << std::endl; 
-	TestProfiler();
+	// TestProfiler();
 	// TestNewTracer(); 
 	// TestSPSCQueue(); 
 
@@ -16,6 +16,7 @@ int main() {
 
 	// test_cstr_hash_map();
 	// test_cstr_hash_map_performance();
+	test_indexed_heap(); 
 
 	// __debugbreak(); 
 

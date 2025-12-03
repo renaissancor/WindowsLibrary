@@ -21,8 +21,9 @@
 #include <functional>
 #include <atomic>
 #include <thread>
-#include <filesystem>
 #include <random>
 
+#include <queue>
+#include <cassert>
 
 #include <stdexcept>

@@ -47,6 +47,9 @@
     <ClInclude Include="Include\cstr_hash_map.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\indexed_heap.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NewTracer.cpp">

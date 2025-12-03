@@ -191,6 +191,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Sources\test_indexed_heap.cpp" />
     <ClCompile Include="Sources\main.cpp" />
     <ClCompile Include="Sources\pch.cpp" />
     <ClCompile Include="Sources\TestGuardOverflow.cpp" />

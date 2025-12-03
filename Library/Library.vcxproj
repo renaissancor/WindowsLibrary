@@ -173,6 +173,7 @@
   <ItemGroup>
     <ClInclude Include="Include\cstr_hash_map.h" />
     <ClInclude Include="Include\GuardOverflow.h" />
+    <ClInclude Include="Include\indexed_heap.h" />
     <ClInclude Include="Include\RingBuffer.h" />
     <ClInclude Include="Include\NewTracer.h" />
     <ClInclude Include="Include\pch.h" />

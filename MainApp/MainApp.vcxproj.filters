@@ -35,6 +35,9 @@
     <ClCompile Include="Sources\TestSerialBuffer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
+    <ClCompile Include="Sources\test_indexed_heap.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\TestFunctions.h">
