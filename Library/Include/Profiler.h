@@ -1,87 +1,98 @@
 #pragma once 
 
 // Profiler.h 
-
-using std::vector;
-using std::string;
-using std::unordered_map;
-using std::pair;
-using std::cout;
-using std::cerr;
+#include "cstr_hash_map.h"
 
 namespace Profiler {
+	
 	enum Unit {
-		NANOSEC, //  nanoseconds 
-		MCROSEC, // microseconds 
-		MILISEC, // milliseconds 
-		SEC, //      seconds 
+		NANOSEC = 0, //  nanoseconds 
+		MCROSEC = 1, // microseconds 
+		MILISEC = 2, // milliseconds 
+		SEC     = 3, //      seconds 
 	};
-	constexpr const char* UnitStr[] = { "ns", "us", "ms", " s" };
-	static LARGE_INTEGER _frequency;
 
-	static void InitProfiler() noexcept {
-		QueryPerformanceFrequency(&_frequency);
-	}
+	struct Record {
+		long long enterTick;
+		long long leaveTick;
+	};
 
-	inline static const long long Frequency() noexcept {
-		return _frequency.QuadPart;
-	}
-
-	inline static const long double GetUnitMultiplier
-	(Profiler::Unit unit) noexcept {
-		switch (unit) {
-		case Profiler::NANOSEC: return 1'000'000'000.0L;
-		case Profiler::MCROSEC: return 1'000'000.0L;
-		case Profiler::MILISEC: return 1'000.0L;
-		case Profiler::SEC: return 1.0L;
-		}
-		return 1.0L;
-	}
-
-	// Singleton Manager 
+	struct SummaryData {
+		long long totalTimeRaw = 0;
+		long long minTimeRaw = LLONG_MAX;
+		long long maxTimeRaw = LLONG_MIN;
+		size_t callCount = 0;
+	};
+			
 	class Manager {
 	private:
-		Manager() noexcept { InitProfiler(); }
+		static constexpr const char* _unit_str[4] = { "ns", "us", "ms", " s" };
+		static constexpr long double _unit_div[4] = { 1'000'000'000.0L, 1'000'000.0L, 1'000.0L, 1.0L };
+		
+		Manager() noexcept {
+			QueryPerformanceFrequency(&_frequency);
+			_thread_id = GetCurrentThreadId();
+		}
 		~Manager() noexcept = default;
+		LARGE_INTEGER _frequency = { 0 }; // _frequency.QuadPart gives counts per second
+		DWORD _thread_id = 0; 
+		cstr_hash_map<std::vector<Record>> _records; 
+
+	public:
 		Manager(const Manager&) = delete;
 		Manager& operator=(const Manager&) = delete;
 
-	private:
-		typedef struct _Data {
-			long long init;
-			long long term;
-		} Data;
-		unordered_map<const char*, vector<Data>> _func_map;
-
-	public:
-		static Manager& GetInstance() noexcept
+		inline static Manager& GetInstance() noexcept
 		{
 			thread_local Manager instance;
 			return instance;
 		}
+		
+		inline DWORD GetThreadId() const noexcept { return _thread_id; }
+		inline long long Frequency() const noexcept { return _frequency.QuadPart; }
+		inline void Clear() noexcept { _records.clear(); } 
+		inline const char* GetUnitStr(Unit unit) noexcept { return _unit_str[static_cast<int>(unit)]; }
+		inline long double GetUnitMultiplier(Unit unit) noexcept { return _unit_div[static_cast<int>(unit)]; }
 
-		inline void ClearData() noexcept {
-			_func_map.clear();
+		inline void Add(const char* sectionName, long long enterTick, long long leaveTick) noexcept
+		{
+			auto& vec = _records[sectionName];
+			vec.push_back(Record{ enterTick, leaveTick });
 		}
 
-		void AddProfile(const char* section_name, long long init, long long term) noexcept;
-		void PrintConsoleTick() const noexcept;
-		void PrintConsoleTime(Unit unit) const noexcept;
+		void PrintConsoleTick() const noexcept; 
+		void PrintConsoleTime(Unit unit = MCROSEC) noexcept;  
 
-		void SaveDataTXT(const string& filepath, Unit unit) noexcept;
-		void SaveDataCSV(const string& filepath, Unit unit) noexcept;
-		void SaveFuncCSV(const string& filepath) noexcept;
+		SummaryData GetFunctionSummary(const std::vector<Record>& records) const noexcept;
+
+		void SaveDataTXT(const std::string& filepath, Unit unit = MCROSEC) noexcept;
+		void SaveDataCSV(const std::string& filepath, Unit unit = MCROSEC) noexcept;
+		void SaveFuncCSV(const std::string& filepath) noexcept;
 	};
 
-	class EnterSection {
+	class Enter {
 	private:
-		bool _finish;
-		const char* _section_name;
-		LARGE_INTEGER _time_init;
+		const char* _sectionName = nullptr;
+		LARGE_INTEGER _enterTick;
+		bool _stopped = false;
 
+		void Stop() noexcept {
+			if (_stopped) return;
+			_stopped = true;
+			LARGE_INTEGER leaveTick;
+			QueryPerformanceCounter(&leaveTick);
+			Manager::GetInstance().Add(_sectionName, _enterTick.QuadPart, leaveTick.QuadPart);
+
+		}
 	public:
-		EnterSection(const char* section_name) noexcept;
-		void LeaveSection() noexcept;
-		~EnterSection() noexcept;
+		explicit Enter(const char* sectionName) noexcept
+			: _sectionName(sectionName)
+		{
+			QueryPerformanceCounter(&_enterTick);
+		}
+
+		inline void Leave() noexcept { Stop(); }
+		inline ~Enter() noexcept { Stop(); } 
+		
 	};
 }

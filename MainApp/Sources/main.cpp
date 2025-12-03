@@ -5,7 +5,7 @@
 int main() {
 
 	// std::cout << "Hello, World!" << std::endl; 
-	// TestProfiler();
+	TestProfiler();
 	// TestNewTracer(); 
 	// TestSPSCQueue(); 
 
@@ -14,8 +14,8 @@ int main() {
 	// SPMC is not working properly yet 
 	// TestSPMCQueue();
 
-	test_cstr_hash_map();
-	test_cstr_hash_map_performance();
+	// test_cstr_hash_map();
+	// test_cstr_hash_map_performance();
 
 	// __debugbreak(); 
 

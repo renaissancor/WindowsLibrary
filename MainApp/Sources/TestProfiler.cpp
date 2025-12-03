@@ -1,108 +1,90 @@
 #include "pch.h"
+#include "Profiler.h"
 
-#include "Profiler.h" 
-
-struct ThreadParam {
-	int id;
-};
+static int getThreadRandom(int minVal, int maxVal) {
+    return minVal + (rand() % (maxVal - minVal + 1));
+}
 
 static void funcA() noexcept {
-	Profiler::EnterSection profile("funcA");
-	Sleep(1 + rand() % 2);
-	printf("In funcA\n");
+    Profiler::Enter profile("funcA");
+    Sleep(getThreadRandom(1, 2));
+    printf("In funcA\n");
 }
 
 static void funcB() noexcept {
-	Profiler::EnterSection profile("funcB");
-	Sleep(1 + rand() % 2);
-	profile.LeaveSection();
-	printf("In funcB\n");
+    Profiler::Enter profile("funcB");
+    Sleep(getThreadRandom(1, 2));
+    printf("In funcB\n");
 }
 
 static void funcC() noexcept {
-
-	Sleep(1 + rand() % 2);
-	Profiler::EnterSection profile("funcC");
-	profile.LeaveSection();
-	printf("In funcC\n");
+    Sleep(getThreadRandom(1, 2));
+    Profiler::Enter profile("funcC");
+    printf("In funcC\n");
 }
 
-static unsigned int __stdcall ThreadFunc(void* arg) noexcept {
-	ThreadParam* param = reinterpret_cast<ThreadParam*>(arg);
-	int thread_id = param->id;
-	// int thread_id = GetCurrentThreadId(); 
-	srand(static_cast<unsigned int>(time(NULL) + thread_id));
-	for (int i = 0; i < 100; ++i) {
-		if (rand() % 3 == 0) funcA();
-		else if (rand() % 2 == 0) funcB();
-		else funcC();
-	}
+unsigned int __stdcall ThreadFunc(void* arg) noexcept {
+    int thread_id = *reinterpret_cast<int*>(arg);
 
-	// Make profile directory first 
-	string save_data_txt_path = ".\\profile\\profiler_results_txt_thread_" + std::to_string(thread_id) + ".txt";
-	Profiler::Manager::GetInstance().SaveDataTXT(save_data_txt_path, Profiler::MILISEC);
-	string save_data_csv_path = ".\\profile\\profiler_results_csv_thread_" + std::to_string(thread_id) + ".csv";
-	Profiler::Manager::GetInstance().SaveDataCSV(save_data_csv_path, Profiler::MILISEC);
-	string save_func_csv_path = ".\\profile\\profiler_funcall_csv_thread_" + std::to_string(thread_id) + ".csv";
-	Profiler::Manager::GetInstance().SaveFuncCSV(save_func_csv_path);
+    // 스레드별로 srand 시드 설정 (시간+스레드ID)
+    srand(static_cast<unsigned int>(time(NULL)) + thread_id);
 
-	return 0;
+    for (int i = 0; i < 100; ++i) {
+        int choice = rand() % 3;
+        switch (choice) {
+        case 0: funcA(); break;
+        case 1: funcB(); break;
+        default: funcC(); break;
+        }
+    }
+
+    // 프로파일 결과 저장 폴더 생성 (없으면)
+    CreateDirectoryA(".\\profile", NULL);
+
+    std::string basePath = ".\\profile\\profiler_results_thread_" + std::to_string(thread_id);
+    auto& profiler = Profiler::Manager::GetInstance();
+    profiler.SaveDataTXT(basePath + ".txt", Profiler::MILISEC);
+    profiler.SaveDataCSV(basePath + ".csv", Profiler::MILISEC);
+    profiler.SaveFuncCSV(basePath + "_func.csv");
+
+    return 0;
 }
-
 
 int TestProfiler() noexcept {
+    constexpr size_t threadCount = 4;
+    HANDLE threads[threadCount] = { NULL };
+    int threadIds[threadCount] = { 0 };
 
-	constexpr const size_t thread_size = 4;
+    for (size_t i = 0; i < threadCount; ++i)
+        threadIds[i] = static_cast<int>(i);
 
-	HANDLE threads[thread_size] = { 0, };
-	unsigned int thread_ids[thread_size] = { 0, };
-	ThreadParam params[thread_size] = { { 0 }, };
+    for (size_t i = 0; i < threadCount; ++i) {
+        threads[i] = (HANDLE)_beginthreadex(nullptr, 0, &ThreadFunc, &threadIds[i], 0, nullptr);
+    }
 
-	for (size_t i = 0; i < thread_size; ++i) {
-		params[i].id = static_cast<int>(i);
-	}
+    WaitForMultipleObjects(static_cast<DWORD>(threadCount), threads, TRUE, INFINITE);
 
-	for (size_t i = 0; i < thread_size; ++i) {
-		threads[i] = (HANDLE)_beginthreadex(
-			NULL,
-			0,
-			&ThreadFunc,
-			&params[i],
-			0,
-			&thread_ids[i]
-		);
-	}
+    char buffer[512];
+    for (size_t i = 0; i < threadCount; ++i) {
+        std::string path = ".\\profile\\profiler_results_thread_" + std::to_string(i) + ".txt";
+        FILE* fp = nullptr;
+        if (fopen_s(&fp, path.c_str(), "r") == 0 && fp) {
+            printf("Contents of %s:\n", path.c_str());
+            while (fgets(buffer, sizeof(buffer), fp)) {
+                printf("%s", buffer);
+            }
+            fclose(fp);
+        }
+        else {
+            printf("Failed to open %s\n", path.c_str());
+        }
+    }
 
-	WaitForMultipleObjects(thread_size, threads, TRUE, INFINITE);
-	// Get Current Directory
-	printf("\nCurrent Directory: ");
-	char buffer[MAX_PATH];
-	GetCurrentDirectoryA(MAX_PATH, buffer);
-	printf("%s\n", buffer);
+    for (size_t i = 0; i < threadCount; ++i) {
+        if (threads[i]) {
+            CloseHandle(threads[i]);
+        }
+    }
 
-	for (size_t i = 0; i < thread_size; ++i) {
-		std::string path = "profile\\profiler_results_txt_thread_" + std::to_string(i) + ".txt";
-		// Load File and Print 
-		FILE* fp = nullptr;
-		errno_t err = fopen_s(&fp, path.c_str(), "r");
-		if (err != 0 || fp == nullptr) {
-			printf("Error: Unable to open file %s for reading.\n", path.c_str());
-			continue;
-		}
-		printf("Contents of %s:\n", path.c_str());
-		// char buffer[256] = { 0, }; 
-		while (fgets(buffer, sizeof(buffer), fp) != nullptr) {
-			printf("%s", buffer);
-		}
-		fclose(fp);
-	}
-
-	for (size_t i = 0; i < thread_size; ++i) {
-		if (threads[i]) {
-			CloseHandle(threads[i]);
-			threads[i] = NULL;
-		}
-	}
-
-	return 0;
+    return 0;
 }

@@ -75,5 +75,8 @@
     <Text Include="SPSCMPSCSPMC.txt">
       <Filter>Record</Filter>
     </Text>
+    <Text Include="ProfilerRecord.txt">
+      <Filter>Record</Filter>
+    </Text>
   </ItemGroup>
 </Project>

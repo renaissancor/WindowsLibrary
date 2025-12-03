@@ -121,6 +121,66 @@ public:
 		}
 	};
 
+	class const_iterator {
+	private:
+		const Node* _node;
+		Node* const* _buckets;
+		size_t _capacity;
+		size_t _bucket_index;
+	public:
+		const_iterator() noexcept
+			: _node(nullptr), _buckets(nullptr), _capacity(0), _bucket_index(0) {
+		}
+
+		const_iterator(const Node* n, Node* const* b, size_t cap, size_t idx) noexcept
+			: _node(n), _buckets(b), _capacity(cap), _bucket_index(idx) {
+		}
+
+		const char* key() const noexcept { return _node->key; }
+		const V& value() const noexcept { return _node->value; }
+
+		std::pair<const char*, const V&> operator*() const noexcept {
+			return { _node->key, _node->value };
+		}
+
+		const_iterator& operator++() noexcept {
+			if (_node && _node->next) {
+				_node = _node->next;
+				return *this;
+			}
+			for (++_bucket_index; _bucket_index < _capacity; ++_bucket_index) {
+				if (_buckets[_bucket_index]) {
+					_node = _buckets[_bucket_index];
+					return *this;
+				}
+			}
+			_node = nullptr;
+			_bucket_index = _capacity;
+			return *this;
+		}
+
+		bool operator==(const const_iterator& other) const noexcept {
+			return _node == other._node;
+		}
+		bool operator!=(const const_iterator& other) const noexcept {
+			return _node != other._node;
+		}
+	};
+
+	const_iterator begin() const noexcept {
+		for (size_t i = 0; i < _capacity; ++i) {
+			if (_bucket[i]) {
+				return const_iterator(_bucket[i], _bucket, _capacity, i);
+			}
+		}
+		return end();
+	}
+
+	const_iterator end() const noexcept {
+		return const_iterator(nullptr, _bucket, _capacity, _capacity);
+	}
+
+
 	iterator begin() noexcept {
 		for (size_t i = 0; i < _capacity; ++i) {
 			if (_bucket[i]) {

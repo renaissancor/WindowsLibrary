@@ -4,42 +4,28 @@
 
 // Profiler.cpp 
 
-void Profiler::Manager::AddProfile
-(const char* section_name, long long init, long long term) noexcept
-{
-	auto itr = _func_map.find(section_name);
-	if (itr == _func_map.end()) {
-		_func_map[section_name] = { {init, term} };
-	}
-	else {
-		_func_map[section_name].push_back({ init, term });
-	}
-}
-
 void Profiler::Manager::PrintConsoleTick() const noexcept
 {
-	QueryPerformanceFrequency(&_frequency);
-	// long double frequency = static_cast<long double>(_frequency.QuadPart);
-
 	printf("----------------------------------\n");
-	for (const auto& pair : _func_map) {
-		const char* func_name = pair.first;
-		const vector<Data>& data = pair.second;
-		if (data.empty()) continue;
+	for (auto it = _records.begin(); it != _records.end(); ++it) {
+		const char* functionName = it.key();
+
+		const std::vector<Record>& records = it.value();
+
+		if (records.empty()) continue;
 
 		long long total_time_raw = 0;
 		long long min_time_raw = LLONG_MAX;
 		long long max_time_raw = LLONG_MIN;
 
-		for (auto& datus : data) {
-			// printf("%llu ", tick_row); 
-			long long tick_row = datus.term - datus.init;
+		for (const auto& rec : records) {
+			long long tick_row = rec.leaveTick - rec.enterTick;
 			total_time_raw += tick_row;
 			if (tick_row < min_time_raw) min_time_raw = tick_row;
 			if (tick_row > max_time_raw) max_time_raw = tick_row;
 		}
 
-		printf("Function %s Calls : %zu\n", func_name, data.size());
+		printf("Function %s Calls : %zu\n", functionName, records.size());
 		printf("Frequency    : %11lld ticks/sec \n", _frequency.QuadPart);
 		printf("Total Ticks  : %11lld \n", total_time_raw);
 		printf("Min Ticks    : %11lld \n", min_time_raw);
@@ -48,9 +34,10 @@ void Profiler::Manager::PrintConsoleTick() const noexcept
 	}
 }
 
-void Profiler::Manager::PrintConsoleTime(Unit unit) const noexcept {
+
+void Profiler::Manager::PrintConsoleTime(Unit unit) noexcept {
 	long double multiplier = GetUnitMultiplier(unit);
-	const char* unit_str = UnitStr[unit];
+	const char* unit_str = GetUnitStr(unit); 
 	QueryPerformanceFrequency(&_frequency);
 	long double frequency = static_cast<long double>(_frequency.QuadPart);
 
@@ -60,172 +47,176 @@ void Profiler::Manager::PrintConsoleTime(Unit unit) const noexcept {
 	}
 
 	printf("----------------------------------\n");
-	for (const auto& pair : _func_map) {
-		const char* func_name = pair.first;
-		const std::vector<Data>& data = pair.second;
-		if (data.empty()) continue;
+	for (auto it = _records.begin(); it != _records.end(); ++it) {
+		const char* func_name = it.key();
+		const std::vector<Record>& records = it.value();
+
+		if (records.empty()) continue;
 
 		long long total_time_raw = 0;
 		long long min_time_raw = LLONG_MAX;
 		long long max_time_raw = LLONG_MIN;
 
-
-		for (auto& datus : data) {
-			long long tick_row = datus.term - datus.init;
+		for (const auto& rec : records) {
+			long long tick_row = rec.leaveTick - rec.enterTick;
 			total_time_raw += tick_row;
 			if (tick_row < min_time_raw) min_time_raw = tick_row;
 			if (tick_row > max_time_raw) max_time_raw = tick_row;
 		}
 
 		long double total_time = static_cast<long double>(total_time_raw) / frequency * multiplier;
-		long double avg_time = total_time / data.size();
+		long double avg_time = total_time / records.size();
 		long double min_time = static_cast<long double>(min_time_raw) / frequency * multiplier;
 		long double max_time = static_cast<long double>(max_time_raw) / frequency * multiplier;
 
-		printf("Function %s Calls : %zu\n", func_name, data.size());
+		printf("Function %s Calls : %zu\n", func_name, records.size());
 		printf("Total Time   : %16.4Lf %s \n", total_time, unit_str);
-		printf("Average Time : %16.4Lf %s \n", data.size() > 0 ? avg_time : 0.0L, unit_str);
+		printf("Average Time : %16.4Lf %s \n", avg_time, unit_str);
 		printf("Min Time     : %16.4Lf %s \n", min_time, unit_str);
 		printf("Max Time     : %16.4Lf %s \n", max_time, unit_str);
 		printf("----------------------------------\n");
 	}
 }
 
-void Profiler::Manager::SaveDataTXT(const string& filepath, Unit unit) noexcept
-{
-	FILE* fp = nullptr;
-	fopen_s(&fp, filepath.c_str(), "w");
-	if (fp == nullptr) {
-		cerr << "Error: Unable to open file " << filepath << " for writing.\n";
+Profiler::SummaryData Profiler::Manager::GetFunctionSummary
+	(const std::vector<Profiler::Record>& records) const noexcept {
+
+	SummaryData summary; 
+	summary.callCount = records.size(); 
+
+	for (const auto& rec : records) {
+		long long tick_row = rec.leaveTick - rec.enterTick;
+		summary.totalTimeRaw += tick_row;
+		if (tick_row < summary.minTimeRaw) summary.minTimeRaw = tick_row;
+		if (tick_row > summary.maxTimeRaw) summary.maxTimeRaw = tick_row;
+	}
+	if (summary.callCount == 0) {
+		summary.minTimeRaw = 0; 
+		summary.maxTimeRaw = 0; 
+	}
+	return summary;
+}
+
+void Profiler::Manager::SaveDataTXT(const std::string& filepath, Unit unit) noexcept {
+	FILE* file = nullptr;
+	fopen_s(&file, filepath.c_str(), "w");
+	if (!file) {
+		std::cerr << "Error: Unable to open file " << filepath << " for writing.\n";
 		return;
 	}
 	long double multiplier = GetUnitMultiplier(unit);
-	const char* unit_str = UnitStr[unit];
+	const char* unit_str = GetUnitStr(unit);
 	QueryPerformanceFrequency(&_frequency);
 	long double frequency = static_cast<long double>(_frequency.QuadPart);
 	if (frequency == 0.0L) {
-		fprintf(fp, "Error: Performance counter frequency is zero. Cannot calculate time.\n");
-		fclose(fp);
+		fprintf(file, "Error: Performance counter frequency is zero. Cannot calculate time.\n");
+		fclose(file);
 		return;
 	}
-	fprintf(fp, "----------------------------------\n");
-	for (const auto& pair : _func_map) {
-		const char* section_name = pair.first;
-		const std::vector<Data>& data = pair.second;
-		if (data.empty()) continue;
+	fprintf(file, "----------------------------------\n");
+	for (auto it = _records.begin(); it != _records.end(); ++it) {
+		const char* func_name = it.key();
+		const std::vector<Record>& records = it.value();
+		if (records.empty()) continue;
 		long long total_time_raw = 0;
 		long long min_time_raw = LLONG_MAX;
 		long long max_time_raw = LLONG_MIN;
-		for (auto& datus : data) {
-			// printf("%llu ", tick_row);
-			long long tick_row = datus.term - datus.init;
+		for (const auto& rec : records) {
+			long long tick_row = rec.leaveTick - rec.enterTick;
 			total_time_raw += tick_row;
 			if (tick_row < min_time_raw) min_time_raw = tick_row;
 			if (tick_row > max_time_raw) max_time_raw = tick_row;
 		}
 		long double total_time = static_cast<long double>(total_time_raw) / frequency * multiplier;
-		long double avg_time = total_time / data.size();
+		long double avg_time = total_time / records.size();
 		long double min_time = static_cast<long double>(min_time_raw) / frequency * multiplier;
 		long double max_time = static_cast<long double>(max_time_raw) / frequency * multiplier;
-		fprintf(fp, "Function %s Calls : %zu\n", section_name, data.size());
-		fprintf(fp, "Total Time   : %16.4Lf %s \n", total_time, unit_str);
-		fprintf(fp, "Average Time : %16.4Lf %s \n", data.size() > 0 ? avg_time : 0.0L, unit_str);
-		fprintf(fp, "Min Time     : %16.4Lf %s \n", min_time, unit_str);
-		fprintf(fp, "Max Time     : %16.4Lf %s \n", max_time, unit_str);
-		fprintf(fp, "----------------------------------\n");
+		fprintf(file, "Function %s Calls : %zu\n", func_name, records.size());
+		fprintf(file, "Total Time   : %16.4Lf %s \n", total_time, unit_str);
+		fprintf(file, "Average Time : %16.4Lf %s \n", avg_time, unit_str);
+		fprintf(file, "Min Time     : %16.4Lf %s \n", min_time, unit_str);
+		fprintf(file, "Max Time     : %16.4Lf %s \n", max_time, unit_str);
+		fprintf(file, "----------------------------------\n");
 	}
-	fclose(fp);
+	fclose(file);
 }
 
-void Profiler::Manager::SaveDataCSV(const string& filepath, Unit unit) noexcept
-{
-	std::ofstream ofs(filepath);
-	if (!ofs.is_open()) {
-		cerr << "Error: Unable to open file " << filepath << " for writing.\n";
+void Profiler::Manager::SaveDataCSV(const std::string& filepath, Unit unit) noexcept {
+	FILE* file = nullptr;
+	fopen_s(&file, filepath.c_str(), "w");
+	if (!file) {
+		std::cerr << "Error: Unable to open file " << filepath << " for writing.\n";
 		return;
 	}
-
 	long double multiplier = GetUnitMultiplier(unit);
-	const char* unit_str = UnitStr[unit];
+	const char* unit_str = GetUnitStr(unit);
+	QueryPerformanceFrequency(&_frequency);
 	long double frequency = static_cast<long double>(_frequency.QuadPart);
 	if (frequency == 0.0L) {
-		ofs << "Error: Performance counter frequency is zero. Cannot calculate time.\n";
-		ofs.close();
+		fprintf(file, "Error: Performance counter frequency is zero. Cannot calculate time.\n");
+		fclose(file);
 		return;
 	}
-
-	ofs << "Function,Calls,Total Time (" << unit_str << "),Average Time ("
-		<< unit_str << "),Min Time (" << unit_str << "),Max Time (" << unit_str << ")\n";
-
-	for (const auto& pair : _func_map) {
-		const char* func_name = pair.first;
-		const std::vector<Data>& data = pair.second;
-
+	fprintf(file, "Function Name,Call Count,Total Time (%s),Average Time (%s),Min Time (%s),Max Time (%s)\n",
+		unit_str, unit_str, unit_str, unit_str);
+	for (auto it = _records.begin(); it != _records.end(); ++it) {
+		const char* func_name = it.key();
+		const std::vector<Record>& records = it.value();
+		if (records.empty()) continue;
 		long long total_time_raw = 0;
 		long long min_time_raw = LLONG_MAX;
 		long long max_time_raw = LLONG_MIN;
-		for (auto& datus : data) {
-			long long tick_row = datus.term - datus.init;
+		for (const auto& rec : records) {
+			long long tick_row = rec.leaveTick - rec.enterTick;
 			total_time_raw += tick_row;
 			if (tick_row < min_time_raw) min_time_raw = tick_row;
 			if (tick_row > max_time_raw) max_time_raw = tick_row;
 		}
 		long double total_time = static_cast<long double>(total_time_raw) / frequency * multiplier;
-		long double avg_time = total_time / data.size();
+		long double avg_time = total_time / records.size();
 		long double min_time = static_cast<long double>(min_time_raw) / frequency * multiplier;
 		long double max_time = static_cast<long double>(max_time_raw) / frequency * multiplier;
-		ofs << func_name << "," << data.size() << ","
-			<< total_time << ","
-			<< (data.size() > 0 ? avg_time : 0.0L) << ","
-			<< min_time << ","
-			<< max_time << "\n";
+		fprintf(file, "%s,%zu,%.4Lf,%.4Lf,%.4Lf,%.4Lf\n",
+			func_name,
+			records.size(),
+			total_time,
+			avg_time,
+			min_time,
+			max_time
+		);
 	}
+	fclose(file);
 }
 
-void Profiler::Manager::SaveFuncCSV(const string& filepath) noexcept
-{
-	std::ofstream ofs(filepath);
-	if (!ofs.is_open()) {
-		cerr << "Error: Unable to open file " << filepath << " for writing.\n";
+void Profiler::Manager::SaveFuncCSV(const std::string& filepath) noexcept {
+	FILE* file = nullptr;
+	fopen_s(&file, filepath.c_str(), "w");
+	if (!file) {
+		std::cerr << "Error: Unable to open file " << filepath << " for writing.\n";
 		return;
 	}
-	QueryPerformanceFrequency(&_frequency);
-	long double frequency = static_cast<long double>(_frequency.QuadPart);
-	if (frequency == 0.0L) {
-		ofs << "Error: Performance counter frequency is zero. Cannot calculate time.\n";
-		ofs.close();
-		return;
-	}
-	ofs << "Function,Count,init,term,time\n";
-	for (const auto& pair : _func_map) {
-		const std::string& func_name = pair.first;
-		const std::vector<Data>& data = pair.second;
-		for (size_t i = 0; i < data.size(); ++i) {
-			ofs << func_name << "," << (i + 1) << "," << data[i].init << "," << data[i].term << ',' << data[i].term - data[i].init << "\n";
+	fprintf(file, "Function Name,Call Count,Total Ticks,Min Ticks,Max Ticks\n");
+	for (auto it = _records.begin(); it != _records.end(); ++it) {
+		const char* func_name = it.key();
+		const std::vector<Record>& records = it.value();
+		if (records.empty()) continue;
+		long long total_time_raw = 0;
+		long long min_time_raw = LLONG_MAX;
+		long long max_time_raw = LLONG_MIN;
+		for (const auto& rec : records) {
+			long long tick_row = rec.leaveTick - rec.enterTick;
+			total_time_raw += tick_row;
+			if (tick_row < min_time_raw) min_time_raw = tick_row;
+			if (tick_row > max_time_raw) max_time_raw = tick_row;
 		}
+		fprintf(file, "%s,%zu,%lld,%lld,%lld\n",
+			func_name,
+			records.size(),
+			total_time_raw,
+			min_time_raw,
+			max_time_raw
+		);
 	}
+	fclose(file);
 }
 
-Profiler::EnterSection::EnterSection(const char* section_name) noexcept
-	: _section_name(section_name), _finish(false), _time_init()
-{
-	QueryPerformanceCounter(&_time_init);
-}
-
-void Profiler::EnterSection::LeaveSection() noexcept {
-	if (_finish) return;
-	LARGE_INTEGER time_term;
-	QueryPerformanceCounter(&time_term);
-	// long long elapsed_time = time_term.QuadPart - _time_init.QuadPart;
-	Manager::GetInstance().AddProfile(_section_name, _time_init.QuadPart, time_term.QuadPart);
-	_finish = true;
-}
-
-Profiler::EnterSection::~EnterSection() noexcept
-{
-	if (_finish) return;
-	LARGE_INTEGER time_term;
-	QueryPerformanceCounter(&time_term);
-	// long long elapsed_time = time_term.QuadPart - _time_init.QuadPart;
-	Manager::GetInstance().AddProfile(_section_name, _time_init.QuadPart, time_term.QuadPart);
-}

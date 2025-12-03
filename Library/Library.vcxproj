@@ -198,6 +198,7 @@
     <ClCompile Include="Sources\WinThread.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="ProfilerRecord.txt" />
     <Text Include="SPSCMPSCSPMC.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
