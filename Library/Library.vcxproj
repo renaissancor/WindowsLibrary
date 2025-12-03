@@ -171,12 +171,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Include\cstr_hash_map.h" />
     <ClInclude Include="Include\GuardOverflow.h" />
     <ClInclude Include="Include\RingBuffer.h" />
-    <ClInclude Include="Include\ro_hash_map.h" />
     <ClInclude Include="Include\NewTracer.h" />
     <ClInclude Include="Include\pch.h" />
     <ClInclude Include="Include\Profiler.h" />
+    <ClInclude Include="Include\SerialBuffer.h" />
     <ClInclude Include="Include\UniquePtr.h" />
     <ClInclude Include="Include\WinAtomic.h" />
     <ClInclude Include="Include\WinMutex.h" />
@@ -193,7 +194,6 @@
     </ClCompile>
     <ClCompile Include="Sources\Profiler.cpp" />
     <ClCompile Include="Sources\RingBuffer.cpp" />
-    <ClCompile Include="Sources\ro_hash_map.cpp" />
     <ClCompile Include="Sources\whatever.cpp" />
     <ClCompile Include="Sources\WinThread.cpp" />
   </ItemGroup>

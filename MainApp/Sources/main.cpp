@@ -14,14 +14,16 @@ int main() {
 	// SPMC is not working properly yet 
 	// TestSPMCQueue();
 
-	// test_ro_hash_map(); 
-	// test_ro_hash_map_performance(); 
+	test_cstr_hash_map();
+	test_cstr_hash_map_performance();
 
 	// __debugbreak(); 
 
 	// test_guard_overflow(); 
 
-	test_win_thread(); 
+	// test_win_thread(); 
+
+	// test_serial_buffer(); 
 
     return 0;
 }

@@ -17,7 +17,7 @@ RingBuffer::~RingBuffer()
 
 void RingBuffer::ResizeBuffer(const int newCapacity) noexcept {
 	if (newCapacity <= _capacity) return;
-	char* newBuffer = new char[newCapacity]; // can throw bad_alloc 
+	char* newBuffer = new char[newCapacity]; // if throw bad_alloc, terminate process 
 	int usedSize = GetUsedSize();
 	Peek(newBuffer, usedSize);
 	delete[] _buffer;

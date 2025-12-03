@@ -154,6 +154,73 @@ void TestClass () {
 
 int main() {
     
+    const size_t SIZE = 4096; // 1 페이지
+    const char* filename = "test_mmf.bin";
+
+    // 1. 테스트 파일 생성
+    HANDLE hFile = CreateFileA(
+        filename,
+        GENERIC_READ | GENERIC_WRITE,
+        0,
+        NULL,
+        CREATE_ALWAYS,
+        FILE_ATTRIBUTE_NORMAL,
+        NULL
+    );
+
+    if (hFile == INVALID_HANDLE_VALUE) {
+        std::cerr << "CreateFile failed: " << GetLastError() << "\n";
+        return 1;
+    }
+
+    SetFilePointer(hFile, SIZE - 1, NULL, FILE_BEGIN);
+    SetEndOfFile(hFile);
+
+    // 2. File Mapping 생성
+    HANDLE hMap = CreateFileMappingA(
+        hFile,
+        NULL,
+        PAGE_READWRITE,
+        0,
+        SIZE,
+        NULL
+    );
+
+    if (!hMap) {
+        std::cerr << "CreateFileMapping failed: " << GetLastError() << "\n";
+        CloseHandle(hFile);
+        return 1;
+    }
+
+    // 3. 유저모드 주소에 매핑
+    char* pView = (char*)MapViewOfFile(
+        hMap,
+        FILE_MAP_ALL_ACCESS,
+        0,
+        0,
+        SIZE
+    );
+
+    if (!pView) {
+        std::cerr << "MapViewOfFile failed: " << GetLastError() << "\n";
+        CloseHandle(hMap);
+        CloseHandle(hFile);
+        return 1;
+    }
+
+    std::cout << "MMF mapped to user address: " << static_cast<void*>(pView) << "\n";
+
+    // 4. 내용 쓰기
+    strcpy_s(pView, SIZE, "Hello from User Mode MMF!");
+    std::cout << "Wrote to MMF: " << pView << "\n";
+
+    // 5. 테스트: 읽기
+    std::cout << "Reading back: " << pView << "\n";
+
+    // 6. 언매핑 및 종료
+    UnmapViewOfFile(pView);
+    CloseHandle(hMap);
+    CloseHandle(hFile);
 
     return 0; 
 }

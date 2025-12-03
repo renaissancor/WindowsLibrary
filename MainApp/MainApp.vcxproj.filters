@@ -23,13 +23,16 @@
     <ClCompile Include="Sources\TestNewTracer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
-    <ClCompile Include="Sources\test_ro_hash_map.cpp">
+    <ClCompile Include="Sources\test_cstr_hash_map.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\TestGuardOverflow.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\TestWinThread.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="Sources\TestSerialBuffer.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

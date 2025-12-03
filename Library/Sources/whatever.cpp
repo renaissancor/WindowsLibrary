@@ -7,3 +7,5 @@
 #include "WinMutex.h"
 #include "WinAtomic.h"
 #include "WinThread.h" 
+
+#include "cstr_hash_map.h" 

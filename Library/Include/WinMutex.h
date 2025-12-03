@@ -11,7 +11,7 @@ namespace Win {
 		inline Mutex(int countSpinLock_ = 16) noexcept
 		{
 			InitializeCriticalSectionEx(&_cs, countSpinLock_, 0);
-		} // can throw bad_alloc 
+		} // if throw bad_alloc, terminate process 
 
 		inline ~Mutex() noexcept { DeleteCriticalSection(&_cs); }
 
@@ -93,13 +93,13 @@ namespace Win {
 				_owns = true;
 			}
 		}
-		inline void Unlock() {
+		inline void Unlock() noexcept {
 			if (_mtx && _owns) {
 				_mtx->Unlock();
 				_owns = false;
 			}
 		}
-		inline bool TryLock() {
+		inline bool TryLock() noexcept {
 			if (_mtx && !_owns) {
 				if (_mtx->TryLock()) {
 					_owns = true;

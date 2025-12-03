@@ -23,9 +23,6 @@
     <ClInclude Include="Include\pch.h">
       <Filter>Include</Filter>
     </ClInclude>
-    <ClInclude Include="Include\ro_hash_map.h">
-      <Filter>Include</Filter>
-    </ClInclude>
     <ClInclude Include="Include\GuardOverflow.h">
       <Filter>Include</Filter>
     </ClInclude>
@@ -44,6 +41,12 @@
     <ClInclude Include="Include\WinThread.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="Include\SerialBuffer.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\cstr_hash_map.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NewTracer.cpp">
@@ -53,9 +56,6 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\pch.cpp">
-      <Filter>Sources</Filter>
-    </ClCompile>
-    <ClCompile Include="Sources\ro_hash_map.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\GuardOverflow.cpp">

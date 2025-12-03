@@ -19,7 +19,6 @@
 #include <cstring> 
 #include <new>
 #include <cstdint>
-#include <functinal>
 
 #include <conio.h>
 #include <wtypes.h> 
