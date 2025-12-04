@@ -1,10 +1,12 @@
 #pragma once
 
+#include "malloc_vector.h"
+
 namespace NewTracer {
 
     struct Info {         // 32Bit 64Bit 
         void* ptr;        // 4     8 
-        size_t size;      // 4     4 
+        size_t size;      // 4     8 
         const char* file; // 4     8 
         int line;         // 4     4 
 
@@ -22,73 +24,10 @@ namespace NewTracer {
             }
             return *this;
         }
-    };
 
-    class Carray {
-    private:
-        Info* _data;
-        size_t _size;
-        size_t _capacity;
-
-    public:
-        inline bool empty() const noexcept { return _size == 0; }
-        inline size_t size() const noexcept { return _size; }
-        inline size_t capacity() const noexcept { return _capacity; }
-
-    public:
-        Carray();
-        Carray(size_t capacity);
-        Carray(const Carray&) = delete;
-        Carray& operator=(const Carray&) = delete;
-        ~Carray() noexcept;
-
-    public:
-        class iterator;
-        void reserve(size_t capacity);
-        void push(void* ptr, size_t size, const char* file, int line) noexcept;
-        void pop(void* ptr) noexcept;
-        Info* at(size_t idx) noexcept;
-        const Info* at(size_t idx) const noexcept;
-        Info* operator[](size_t idx) noexcept;
-        const Info* operator[](size_t idx) const noexcept;
-
-        // iterator 
-        class iterator {
-        private:
-            Carray* carray;
-            size_t index;
-
-        public:
-            iterator(Carray* ca, size_t idx) noexcept 
-                : carray(ca), index(idx) {}
-
-            Info& operator*() noexcept {
-                return carray->at(index)[0];
-            }
-
-            iterator& operator++() noexcept {
-                if (carray && index < carray->size()) {
-                    ++index;
-                }
-                else {
-                    carray = nullptr;
-                    index = INT_MAX;
-                }
-                return *this;
-            }
-
-            bool operator==(const iterator& other) const noexcept {
-                return (carray == other.carray && index == other.index);
-            }
-
-            bool operator!=(const iterator& other) const noexcept {
-                return !(*this == other);
-            }
-        };
-
-        iterator begin() noexcept { return iterator(this, 0); }
-        iterator end() noexcept { return iterator(nullptr, INT_MAX); }
-        iterator find(void* ptr) noexcept;
+        inline bool operator==(const Info& other) const noexcept {
+            return ptr == other.ptr;
+		}
     };
 
     class Manager {
@@ -98,9 +37,12 @@ namespace NewTracer {
         Manager(const Manager&) = delete;
         Manager& operator=(const Manager&) = delete;
 
-        Carray carray;
+        bool _verbose = true;
+        malloc_vector<Info> _records;
 
     public:
+        inline void SetVerbose(bool v) noexcept { _verbose = v; }
+
         static Manager& GetInstance() noexcept {
             static Manager instance;
             return instance;

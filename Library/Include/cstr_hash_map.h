@@ -18,6 +18,14 @@ private:
 	size_t _size;
 	Node** _bucket;
 
+private: 
+
+	inline static int cstr_cmp(const char* a, const char* b) noexcept {
+		if (a == b) return 0; 
+		while (*a && (*a == *b)) { ++a; ++b; }
+		return static_cast<unsigned char>(*a) - static_cast<unsigned char>(*b);
+	}
+
 	inline static size_t hash_func(const char* key) noexcept {
 		size_t hash = 5381;
 		while (*key) {
@@ -26,9 +34,9 @@ private:
 		return hash;
 	}
 
-	void rehash() noexcept {
+	void rehash() noexcept { 
 		size_t newCapacity = _capacity * 2;
-		Node** newBucket = new Node * [newCapacity]();
+		Node** newBucket = new Node * [newCapacity](); // can throw std::bad_alloc but ignore 
 		for (size_t i = 0; i < _capacity; ++i) {
 			Node* node = _bucket[i];
 			while (node) {
@@ -42,11 +50,6 @@ private:
 		delete[] _bucket;
 		_bucket = newBucket;
 		_capacity = newCapacity;
-	}
-
-	static int cstr_cmp(const char* a, const char* b) noexcept {
-		while (*a && (*a == *b)) { ++a; ++b; }
-		return static_cast<unsigned char>(*a) - static_cast<unsigned char>(*b);
 	}
 
 public:
@@ -219,7 +222,7 @@ public:
 			}
 			node = node->next;
 		}
-		Node* newNode = new Node(key, value);
+		Node* newNode = new Node(key, value); // can throw std::bad_alloc but ignore 
 		newNode->next = _bucket[idx];
 		_bucket[idx] = newNode;
 		++_size;
@@ -295,8 +298,11 @@ public:
 };
 
 /*
-Implementation of a hash map with C-style string keys and generic value type V. 
-Does not consider std::bad_alloc and other exceptions for simplicity.
+Intended to use ONLY C-style string keys (const char*) generated in .rodata segment. 
+Implementation of a hash map with C-style string keys and generic value type V.  
+Does not consider std::bad_alloc and other exceptions for simplicity. 
+Goal is, using only C-style string written raw, and saved at .rodata segment, 
+to have a simple hash map with good performance. 
 Features:
 1. cstr_hash_map Class Template:
    - A hash map implementation that uses C-style strings (const char*) as keys and a generic type V as values.

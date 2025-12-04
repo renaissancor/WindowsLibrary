@@ -9,3 +9,4 @@
 #include "WinThread.h" 
 
 #include "cstr_hash_map.h" 
+#include "malloc_vector.h" 
