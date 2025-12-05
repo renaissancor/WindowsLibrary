@@ -16,7 +16,7 @@ int main() {
 
 	// test_cstr_hash_map();
 	// test_cstr_hash_map_performance();
-	test_indexed_heap(); 
+	// test_indexed_heap(); 
 
 	// __debugbreak(); 
 
@@ -24,7 +24,7 @@ int main() {
 
 	// test_win_thread(); 
 
-	// test_serial_buffer(); 
+	test_serial_buffer(); 
 
     return 0;
 }

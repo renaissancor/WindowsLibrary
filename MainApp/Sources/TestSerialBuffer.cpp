@@ -10,7 +10,9 @@ int test_serial_buffer()
     short c = 456;
 
     // operator<< 로 쓰기
-    buf << a << b << c;
+    buf << a;
+    buf << b; 
+    buf << c; 
 
     std::cout << "Used Size after operator<<: " << buf.GetUsedSize() << std::endl; // 10 (4+4+2)
 
@@ -19,7 +21,9 @@ int test_serial_buffer()
     short c2 = 0;
 
     // operator>> 로 읽기
-    buf >> a2 >> b2 >> c2;
+    buf >> a2;
+    buf >> b2; 
+    buf >> c2;
 
     std::cout << "Read Values: " << a2 << ", " << b2 << ", " << c2 << std::endl;
 

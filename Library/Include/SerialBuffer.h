@@ -34,72 +34,41 @@ public:
 	inline int MoveWritePos(int offset) noexcept { _writePos += offset; return offset; }
 	inline void Clear() noexcept { _readPos = 0; _writePos = 0; }
 
-	inline void PutBytes(const void* src, size_t n) noexcept {
-		memcpy(_buffer + _writePos, src, n);
-		_writePos += (int)n;
-	}
-	inline void GetBytes(void* dst, size_t n) noexcept {
-		memcpy(dst, _buffer + _readPos, n);
-		_readPos += (int)n;
+	template<typename T>
+	inline void Put(const T& val) noexcept {
+		int pos = _writePos;
+		std::memcpy(_buffer + pos, &val, sizeof(T));
+		_writePos = pos + sizeof(T);
 	}
 
-	template<typename T, size_t Size = sizeof(T)>
-	struct SerialBufferHelper {
-		static inline void Put(char* buffer, int& writePos, const T& val) noexcept {
-			memcpy(buffer + writePos, &val, Size);
-			writePos += Size;
-		}
-		static inline void Get(const char* buffer, int& readPos, T& out) noexcept {
-			memcpy(&out, buffer + readPos, Size);
-			readPos += Size;
-		}
-	};
-
-	template<typename T>
-	struct SerialBufferHelper<T, 1> {
-		static void Put(char* buffer, int& writePos, const T& val) noexcept {
-			buffer[writePos++] = *reinterpret_cast<const unsigned char*>(&val);
-		}
-		static void Get(const char* buffer, int& readPos, T& out) noexcept {
-			out = *reinterpret_cast<const unsigned char*>(buffer + readPos++);
-		}
-	};
-
-	template<typename T>
-	SerialBuffer& PutData(const T& val) noexcept {
-		SerialBufferHelper<T>::Put(_buffer, _writePos, val);
+	template<typename T> 
+	inline SerialBuffer& PutData(const T& val) noexcept {
+		Put(val);
 		return *this;
 	}
 
 	template<typename T>
-	SerialBuffer& GetData(T& out) noexcept {
-		SerialBufferHelper<T>::Get(_buffer, _readPos, out);
+	inline void Get(T& out) noexcept {
+		int pos = _readPos;
+		std::memcpy(&out, _buffer + pos, sizeof(T));
+		_readPos = pos + sizeof(T);
+	}
+
+	template<typename T>
+	inline SerialBuffer& GetData(T& out) noexcept {
+		Get(out);
 		return *this;
 	}
 
-	inline SerialBuffer& operator<<(char value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(unsigned char value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(short value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(unsigned short value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(int value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(unsigned int value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(long value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(unsigned long value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(long long value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(unsigned long long value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(float value) noexcept { return PutData(value); }
-	inline SerialBuffer& operator<<(double value) noexcept { return PutData(value); }
+	template<typename T>
+	inline SerialBuffer& operator<<(const T& v) noexcept {
+		Put(v);
+		return *this;
+	}
 
-	inline SerialBuffer& operator>>(char& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(unsigned char& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(short& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(unsigned short& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(int& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(unsigned int& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(long& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(unsigned long& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(long long& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(unsigned long long& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(float& value) noexcept { return GetData(value); }
-	inline SerialBuffer& operator>>(double& value) noexcept { return GetData(value); }
+	template<typename T>
+	inline SerialBuffer& operator>>(T& v) noexcept {
+		Get(v);
+		return *this;
+	}
 };
