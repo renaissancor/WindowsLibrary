@@ -3,6 +3,7 @@
 // Profiler.h 
 #include "cstr_hash_map.h"
 
+namespace Win {
 namespace Profiler {
 	
 	enum Unit {
@@ -95,4 +96,5 @@ namespace Profiler {
 		inline ~Enter() noexcept { Stop(); } 
 		
 	};
-}
+} // End of namespace Profiler 
+} // End of namespace Win 

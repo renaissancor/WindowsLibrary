@@ -229,7 +229,8 @@ public:
 	}
 
 	V& operator[](const char* key) noexcept {
-		size_t idx = hash_func(key) % _capacity;
+		const size_t hash_value = hash_func(key); 
+		size_t idx = hash_value % _capacity;
 		Node* node = _bucket[idx];
 
 		while (node) {
@@ -241,7 +242,7 @@ public:
 
 		if (_size >= static_cast<size_t>(_capacity * LOAD_FACTOR)) {
 			rehash();
-			idx = hash_func(key) % _capacity; 
+			idx = hash_value % _capacity;
 		}
 
 		Node* newNode = new Node(key, V{});
