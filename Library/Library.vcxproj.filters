@@ -53,6 +53,12 @@
     <ClInclude Include="Include\malloc_vector.h">
       <Filter>Include</Filter>
     </ClInclude>
+    <ClInclude Include="WinSharedPtr.h">
+      <Filter>Include</Filter>
+    </ClInclude>
+    <ClInclude Include="WinMemory.h">
+      <Filter>Include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\NewTracer.cpp">
@@ -74,6 +80,9 @@
       <Filter>Sources</Filter>
     </ClCompile>
     <ClCompile Include="Sources\WinThread.cpp">
+      <Filter>Sources</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMemory.cpp">
       <Filter>Sources</Filter>
     </ClCompile>
   </ItemGroup>

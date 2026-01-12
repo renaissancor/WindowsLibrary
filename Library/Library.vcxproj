@@ -194,6 +194,8 @@
     <ClInclude Include="Include\WinAtomic.h" />
     <ClInclude Include="Include\WinMutex.h" />
     <ClInclude Include="Include\WinThread.h" />
+    <ClInclude Include="WinMemory.h" />
+    <ClInclude Include="WinSharedPtr.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Sources\GuardOverflow.cpp" />
@@ -208,6 +210,7 @@
     <ClCompile Include="Sources\RingBuffer.cpp" />
     <ClCompile Include="Sources\whatever.cpp" />
     <ClCompile Include="Sources\WinThread.cpp" />
+    <ClCompile Include="WinMemory.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="ProfilerRecord.txt" />

@@ -6,20 +6,20 @@ static int getThreadRandom(int minVal, int maxVal) {
 }
 
 static void funcA() noexcept {
-    Profiler::Enter profile("funcA");
+    Win::Profiler::Enter profile("funcA");
     Sleep(getThreadRandom(1, 2));
     printf("In funcA\n");
 }
 
 static void funcB() noexcept {
-    Profiler::Enter profile("funcB");
+    Win::Profiler::Enter profile("funcB");
     Sleep(getThreadRandom(1, 2));
     printf("In funcB\n");
 }
 
 static void funcC() noexcept {
     Sleep(getThreadRandom(1, 2));
-    Profiler::Enter profile("funcC");
+    Win::Profiler::Enter profile("funcC");
     printf("In funcC\n");
 }
 
@@ -41,10 +41,10 @@ unsigned int __stdcall ThreadFunc(void* arg) noexcept {
     // 프로파일 결과 저장 폴더 생성 (없으면)
     CreateDirectoryA(".\\profile", NULL);
 
-    std::string basePath = ".\\profile\\profiler_results_thread_" + std::to_string(thread_id);
-    auto& profiler = Profiler::Manager::GetInstance();
-    profiler.SaveDataTXT(basePath + ".txt", Profiler::MILISEC);
-    profiler.SaveDataCSV(basePath + ".csv", Profiler::MILISEC);
+    std::string basePath = ".\\profile\\Win::Profiler_results_thread_" + std::to_string(thread_id);
+    auto& profiler = Win::Profiler::Manager::GetInstance();
+    profiler.SaveDataTXT(basePath + ".txt", Win::Profiler::MILISEC);
+    profiler.SaveDataCSV(basePath + ".csv", Win::Profiler::MILISEC);
     profiler.SaveFuncCSV(basePath + "_func.csv");
 
     return 0;
@@ -52,7 +52,7 @@ unsigned int __stdcall ThreadFunc(void* arg) noexcept {
 
 int TestProfiler() noexcept {
     constexpr size_t threadCount = 4;
-    HANDLE threads[threadCount] = { NULL };
+    HANDLE threads[threadCount] = { NULL, };
     int threadIds[threadCount] = { 0 };
 
     for (size_t i = 0; i < threadCount; ++i)
@@ -66,7 +66,7 @@ int TestProfiler() noexcept {
 
     char buffer[512];
     for (size_t i = 0; i < threadCount; ++i) {
-        std::string path = ".\\profile\\profiler_results_thread_" + std::to_string(i) + ".txt";
+        std::string path = ".\\profile\\Profiler_results_thread_" + std::to_string(i) + ".txt";
         FILE* fp = nullptr;
         if (fopen_s(&fp, path.c_str(), "r") == 0 && fp) {
             printf("Contents of %s:\n", path.c_str());

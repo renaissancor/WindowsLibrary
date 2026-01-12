@@ -26,5 +26,17 @@ int main() {
 
 	test_serial_buffer(); 
 
+	SYSTEM_INFO sysInfo;
+	::GetSystemInfo(&sysInfo); 
+
+	printf("Number of Processors: %lu\n", sysInfo.dwNumberOfProcessors);
+	printf("Page Size: %lu bytes\n", sysInfo.dwPageSize);
+	printf("Processor Type: %lu\n", sysInfo.dwProcessorType);
+	printf("Allocation Granularity: %lu bytes\n", sysInfo.dwAllocationGranularity);
+	printf("Processor Level: %u\n", sysInfo.wProcessorLevel);
+	printf("Processor Revision: %u\n", sysInfo.wProcessorRevision);
+	printf("Minimum Application Address: %p\n", sysInfo.lpMinimumApplicationAddress);
+	printf("Maximum Application Address: %p\n", sysInfo.lpMaximumApplicationAddress);
+
     return 0;
 }

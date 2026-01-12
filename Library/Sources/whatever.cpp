@@ -1,7 +1,6 @@
 #include "pch.h"
 
 #include "UniquePtr.h" 
-
 #include "RingBuffer.h"
 
 #include "WinMutex.h"
